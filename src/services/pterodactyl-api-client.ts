@@ -79,6 +79,16 @@ export default class PterodactylApiClient {
         return response.data;
     }
 
+    async createUser(firstName: string, lastName: string, email: string): Promise<User> {
+        const response = await this.axios.post<User>('/api/application/users', {
+            first_name: firstName,
+            last_name: lastName,
+            email: email,
+            username: firstName+lastName
+        });
+        return response.data;
+    }
+
     async getServers(page = 1, perPage = 10): Promise<PaginatedResponse<Server>> {
         const config: AxiosRequestConfig = {
             params: {
@@ -89,4 +99,46 @@ export default class PterodactylApiClient {
         const response = await this.axios.get<PaginatedResponse<Server>>('/api/application/servers', config);
         return response.data;
     }
+    async getUsers(page = 1, perPage = 10): Promise<PaginatedResponse<User>> {
+        const config: AxiosRequestConfig = {
+            params: {
+                page,
+                'per_page': perPage,
+            },
+        };
+        const response = await this.axios.get<PaginatedResponse<User>>('/api/application/users', config);
+        return response.data;
+    }
+
+    async getUserById(userId: number): Promise<User> {
+        const response = await this.axios.get<User>(`/api/application/users/${userId}`);
+        return response.data;
+    }
+
+    async getUserByUsername(username: string): Promise<User> {
+        const config: AxiosRequestConfig = {
+            params: {
+                'filter': `username==${username}`,
+            },
+        };
+        const response = await this.axios.get<PaginatedResponse<User>>('/api/application/users', config);
+        if (response.data.data.length === 0) {
+            throw new Error(`User with username "${username}" not found`);
+        }
+        return response.data.data[0];
+    }
+
+    async getUserByEmail(email: string): Promise<User> {
+        const config: AxiosRequestConfig = {
+            params: {
+                'filter': `email==${email}`,
+            },
+        };
+        const response = await this.axios.get<PaginatedResponse<User>>('/api/application/users', config);
+        if (response.data.data.length === 0) {
+            throw new Error(`User with email "${email}" not found`);
+        }
+        return response.data.data[0];
+    }
+
 }

@@ -1,55 +1,26 @@
 import { Request, Response } from 'express';
 import Stripe from 'stripe';
+import { StripeWebhookHandler } from '../services/stripe-webhook-handler';
 import PterodactylApiClient from '../services/pterodactyl-api-client';
-import { StripeCustomer, StripeSubscription } from '../models';
+import StripeApiClient from "../services/stripe-api-client";
+import CustomerRepository from "../repositories/CustomerRepository";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2022-11-15',
 });
 
-const pteroApi = new PterodactylApiClient('https://your-ptero-domain.com', 'your_ptero_api_key');
+const pteroApi = new PterodactylApiClient(process.env.PTERODACTYL_BASE_URL, process.env.PTERODACTYL_API_KEY);
+const stripeApi = new StripeApiClient(process.env.STRIPE_API_KEY);
+const customerRepo = new CustomerRepository();
+
+const webhookHandler = new StripeWebhookHandler(stripeApi, pteroApi, customerRepo);
 
 export const handleStripeWebhook = async (req: Request, res: Response) => {
     const sig = req.headers['stripe-signature'];
-    const event = stripe.webhooks.constructEvent(req.body, sig, 'your_stripe_webhook_secret');
+    const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
 
     try {
-        switch (event.type) {
-            case 'customer.subscription.updated': {
-                const subscription = event.data.object as Stripe.Subscription;
-                const customerId = subscription.customer as string;
-                const customer = await stripe.customers.retrieve(customerId);
-
-                // Get the user's UUID from your database using their Stripe customer ID
-                const stripeCustomer = await StripeCustomer.getByCustomerId(customer.id);
-                const user = await pteroApi.getUser(stripeCustomer.uuid);
-
-                // Update the user's server allocation based on the new subscription information
-                const subscriptionData = new StripeSubscription(subscription);
-                const serverAllocation = subscriptionData.toServerAllocation();
-                await pteroApi.updateServerAllocation(user, serverAllocation);
-
-                break;
-            }
-            case 'customer.subscription.deleted': {
-                const subscription = event.data.object as Stripe.Subscription;
-                const customerId = subscription.customer as string;
-                const customer = await stripe.customers.retrieve(customerId);
-
-                // Get the user's UUID from your database using their Stripe customer ID
-                const stripeCustomer = await StripeCustomer.getByCustomerId(customer.id);
-                const user = await pteroApi.getUser(stripeCustomer.uuid);
-
-                // Set the user's server allocation to null
-                await pteroApi.updateServerAllocation(user, null);
-
-                break;
-            }
-            // Handle other event types as necessary
-            default:
-                console.log(`Unhandled event type: ${event.type}`);
-        }
-
+        await webhookHandler.handleEvent(event);
         res.sendStatus(200);
     } catch (err) {
         console.error(err);

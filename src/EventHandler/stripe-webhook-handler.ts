@@ -1,15 +1,22 @@
 import { Request, Response } from 'express';
 import {query} from "../repositories/database";
 import Stripe from 'stripe';
-import PterodactylApiClient, {Server, ServerFeatureLimits, ServerLimits} from '../services/pterodactyl-api-client';
 import StripeApiClient, { Customer } from "../services/stripe-api-client";
 import CustomerRepository from "../repositories/CustomerRepository";
 
+import dotenv from "dotenv"
+dotenv.config()
+import Pterodactyl from 'pterodactyl.js';
+
+const pteroClient = new Pterodactyl.Builder()
+    .setURL(process.env.PTERODACTYL_BASE_URL)
+    .setAPIKey(process.env.PTERODACTYL_API_KEY)
+    .asAdmin();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2022-11-15',
 });
 
-const pteroApi = new PterodactylApiClient('https://panel.ronanhost.com', process.env.PTERODACTYL_API_KEY);
+// const pteroApi = new PterodactylApiClient('https://panel.ronanhost.com', process.env.PTERODACTYL_API_KEY);
 const stripeApi = new StripeApiClient(process.env.STRIPE_API_KEY)
 const customerApi = new CustomerRepository()
 
@@ -27,9 +34,11 @@ export const handleStripeWebhook = async (req: Request, res: Response) => {
                 // Get the customer's information from your database using their Stripe customer ID
                 const stripeCustomer = await stripeApi.getCustomer(customer.id);
                 const customerObj = await customerApi.getCustomerByStripeId(customer.id);
-                const pteroUser = await pteroApi.getUserById(customerObj.pterodactyl_user_id);
+                const pteroUser = await pteroClient.getUser(String(customerObj.pterodactyl_user_id));
 
-                const servers = await pteroApi.getServersByUserId(pteroUser.attributes.id);
+                const servers = (await pteroClient.getServers()).filter(server => server.user === 1);
+                const userServers = servers.filter(server => server.user === 1);
+
                 const server = servers[0];
 
                 const planId = subscription.metadata.plan_id;
@@ -87,33 +96,34 @@ export const handleStripeWebhook = async (req: Request, res: Response) => {
                 const customerId = subscription.customer as string;
                 const customer = await stripe.customers.retrieve(customerId);
 
-                // Get customer information from database using Stripe customer ID
+                // Get customer information from a database using Stripe customer ID
                 const stripeCustomer = await stripeApi.getCustomer(customer.id);
                 const customerObj = await customerApi.getCustomerByStripeId(customer.id);
-                const pteroUser = await pteroApi.getUserById(customerObj.pterodactyl_user_id);
+                const pteroUser = await pteroClient.getUser(String(customerObj.pterodactyl_user_id));
 
-                // Get plan information from database using plan ID
+                // Get plan information from a database using plan ID
                 const plansFDB = await query('SELECT * FROM plan where id = ?', [planId])
                 const plan = plansFDB[0]
 
-                // Create a new server using Pterodactyl API
-                const newServer = await pteroApi.createServer(
-                    plan.name, // server name
-                    plan.description, // server description
-                    pteroUser.attributes.id, // user ID
-                    plan.cpu, // CPU limit
-                    plan.memory, // memory limit
-                    plan.disk, // disk space limit
-                    plan.io, // I/O limit
-                    plan.swap, // swap space limit
-                    plan.threads, // number of threads
-                    plan.allocations, // number of allocations
-                    plan.databases, // number of databases
-                    plan.backups, // number of backups
-                    plan.nest, // nest ID
-                    plan.egg, // egg ID
-                    plan.location // location ID
-                );
+// Create a new server using Pterodactyl API
+                const newServer = await pteroClient.createServer({
+                    allocation: {additional: []},
+                    deploy: {dedicatedIp: false, portRange: [25565, 25566]},
+                    description: "My new Minecraft server",
+                    egg: 1,
+                    environment: {"SERVER_JARFILE": "server.jar", "MEMORY": "2G"},
+                    externalId: "",
+                    featureLimits: {allocations: 0, databases: 0},
+                    image: "minecraft",
+                    limits: {memory: plan.memory, swap: 0, disk: plan.disk, io: 500, cpu: 0},
+                    name: "My Minecraft Server",
+                    outOfMemoryKiller: false,
+                    pack: undefined,
+                    skipScripts: false,
+                    startWhenInstalled: false,
+                    startup: "java -Xmx{{MEMORY}} -Xms{{MEMORY}} -jar {{SERVER_JARFILE}} nogui",
+                    user: pteroUser.id
+                });
                 console.log(`New server created with ID: ${newServer.id}`);
 
                 break;

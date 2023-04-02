@@ -1,1 +1,1 @@
-export declare const handleStripeWebhook: (req: Request, res: Response) => Promise<void>;
+export declare function handleWebhook(request: any, response: any): Promise<any>;

@@ -3,14 +3,14 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv"
 dotenv.config()
 import Pterodactyl, {Server} from "@avionrx/pterodactyl-js"
-import {handleStripeWebhook} from "./src/EventHandler/stripe-webhook-handler.js";
+import {handleWebhook} from "./src/EventHandler/stripe-webhook-handler.js";
 
 // // Imports local
 // import { handleStripeWebhook } from './src/controllers/handleStripeWebhook';
 
 const app = express();
 app.use(bodyParser.raw({ type: 'application/json' }));
-app.post('/webhooks/stripe', handleStripeWebhook);
+app.post('/webhooks/stripe', handleWebhook);
 
 app.get("/", (req, res) => {
     res.send("Hello, world!");

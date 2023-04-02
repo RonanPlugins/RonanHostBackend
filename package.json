@@ -10,13 +10,15 @@
     "dev": "node app.js"
   },
   "dependencies": {
-    "@avionrx/pterodactyl-js": "^2.1.1",
+    "@avionrx/pterodactyl-js": "^2.1.2",
     "@types/axios": "^0.14.0",
     "@types/dotenv": "^8.2.0",
     "@types/stripe": "^8.0.417",
     "@types/uuid": "^9.0.1",
     "express": "^4.18.2",
-    "pterodactyl.js": "^2.1.1"
+    "mysql": "^2.18.1",
+    "pterodactyl.js": "^2.1.1",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@types/mysql": "^2.15.21",

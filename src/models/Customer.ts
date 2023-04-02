@@ -1,8 +1,12 @@
 import {UUID} from "../types/UUID";
-import PterodactylApiClient from '../services/pterodactyl-api-client';
+import Pterodactyl from "@avionrx/pterodactyl-js";
+import dotenv from "dotenv"
+dotenv.config()
 
-
-const pteroApi = new PterodactylApiClient('https://panel.ronanhost.com', process.env.PTERODACTYL_API_KEY);
+const pteroClient = new Pterodactyl.Builder()
+    .setURL(process.env.PTERODACTYL_BASE_URL)
+    .setAPIKey(process.env.PTERODACTYL_API_KEY)
+    .asAdmin();
 
 export default class Customer {
     private _id: UUID;
@@ -26,7 +30,7 @@ export default class Customer {
     }
 
     async loadPterodactylUser(): Promise<void> {
-        this._pterodactyl_user = await pteroApi.getUserById(this.pterodactyl_user_id);
+        this._pterodactyl_user = await pteroClient.getUser(String(this.pterodactyl_user_id));
     }
 
     get stripe_customer(): any {

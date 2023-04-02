@@ -1,19 +1,26 @@
-import { query } from './database';
-import Customer from '../models/Customer'; // assuming you have a User model/interface defined
-import * as UUID from '../types/UUID';
-import PterodactylApiClient from "../services/pterodactyl-api-client";
-import StripeApiClient from "../services/stripe-api-client";
-import NotFoundError from "../Error/NotFoundError";
-import DuplicateError from "../Error/DuplicateError";
-const pteroApi = new PterodactylApiClient(process.env.PTERODACTYL_BASE_URL, process.env.PTERODACTYL_API_KEY);
+import { query } from './database.js';
+import Customer from '../models/Customer.js'; // assuming you have a User model/interface defined
+import { v4 as uuidv4 } from 'uuid';
+import StripeApiClient from "../services/stripe-api-client.js";
+import NotFoundError from "../Error/NotFoundError.js";
+import DuplicateError from "../Error/DuplicateError.js";
+import Pterodactyl from "@avionrx/pterodactyl-js";
+import dotenv from "dotenv";
+dotenv.config();
+const pteroClient = new Pterodactyl.Builder()
+    .setURL(process.env.PTERODACTYL_BASE_URL)
+    .setAPIKey(process.env.PTERODACTYL_API_KEY)
+    .asAdmin();
 const stripeApi = new StripeApiClient(process.env.STRIPE_API_KEY);
 export default class CustomerRepository {
     async createCustomer(email, firstName, lastName) {
-        const insId = UUID.newUUID();
-        const pteroUser = await pteroApi.createUser(firstName, lastName, email).catch(err => { throw err; });
-        const stripeUser = await stripeApi.createCustomer(new Customer(insId, email, firstName + lastName, undefined, pteroUser.attributes.id));
+        const insId = uuidv4();
+        const pteroUser = await pteroClient.createUser({
+            email: email, firstName: firstName, lastName: lastName, username: firstName + lastName
+        }).catch(err => { throw err; });
+        const stripeUser = await stripeApi.createCustomer(new Customer(insId, email, firstName + lastName, undefined, pteroUser.id));
         const name = firstName + lastName;
-        const result = await query('INSERT INTO customer (id, email, name, stripe_customer_id, pterodactyl_user_id) VALUES (?, ?, ?, ?, ?)', [insId, email, name, stripeUser.id, pteroUser.attributes.id]).catch(error => {
+        const result = await query('INSERT INTO customer (id, email, name, stripe_customer_id, pterodactyl_user_id) VALUES (?, ?, ?, ?, ?)', [insId, email, name, stripeUser.id, pteroUser.id]).catch(error => {
             if (error.code === "ER_DUP_ENTRY") {
                 const field = error.message.split("'")[1];
                 throw new DuplicateError('Customer', {
@@ -26,7 +33,7 @@ export default class CustomerRepository {
             }
             throw error;
         });
-        return new Customer(insId, email, firstName + lastName, stripeUser.id, pteroUser.attributes.id);
+        return new Customer(insId, email, firstName + lastName, stripeUser.id, pteroUser.id);
     }
     async getCustomerByEmail(email) {
         const rows = await query('SELECT * FROM customer WHERE email = ?', [email]);

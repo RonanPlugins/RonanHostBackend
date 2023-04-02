@@ -121,10 +121,12 @@ export async function handleWebhook(request, response) {
                         step++;
                         console.log(step);
                         // Create a new server using Pterodactyl API
-                        const availableAllocation = (await node.getAllocations())
-                            .find(allocation => allocation.assigned === false);
-                        step++;
-                        console.log(step);
+                        const availableAllocations = (await node.getAllocations())
+                            .filter(allocation => allocation.assigned === false)
+                            .slice(0, plan.allocations + 1);
+                        const defaultAllocation = availableAllocations[0];
+                        const additionalAllocations = availableAllocations.slice(1, plan.allocations + 1)
+                            .map(allocation => allocation.id);
                         const newServer = await pteroClient.createServer({
                             name: String(pteroUser.firstName) + "'s server",
                             user: pteroUser.id,
@@ -149,8 +151,8 @@ export async function handleWebhook(request, response) {
                             },
                             //@ts-ignore
                             allocation: {
-                                default: availableAllocation.id,
-                                additional: []
+                                default: defaultAllocation.id,
+                                additional: additionalAllocations
                             }
                         }).catch(e => {
                             console.error(e);

@@ -1,5 +1,5 @@
 Logs:\
-`journalctl -u RonanPluginsApi.service -n 100 --no-pager`
+`journalctl -u RonanHostApi.service -n 100 --no-pager`
 
 Service:\
 `RonanHostApi.service`

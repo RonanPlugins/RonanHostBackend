@@ -38,6 +38,15 @@ app.use('/banner', BannerController);
 app.get("/", (req, res) => {
     res.send("Hello, world!");
 });
+
+app.get('/status', (req, res) => {
+    res.status(200).send({
+        "status": "functional",
+        "message": "Yes mate I am working. Please leave me alone!",
+    }
+    )
+})
+
 app.listen(process.env.APP_PORT, async () => {
     console.log("Server listening on port 3006");
 });

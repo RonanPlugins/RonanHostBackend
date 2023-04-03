@@ -7,6 +7,7 @@ import NotFoundError from "../Error/NotFoundError.js";
 import DuplicateError from "../Error/DuplicateError.js";
 import Pterodactyl from "@avionrx/pterodactyl-js";
 import dotenv from "dotenv"
+import Stripe from "stripe";
 dotenv.config()
 
 const pteroClient = new Pterodactyl.Builder()
@@ -42,6 +43,62 @@ export default class CustomerRepository {
             throw error;
         })
         return new Customer(insId, email, firstName+lastName, stripeUser.id, pteroUser.id);
+    }
+
+    async createWithPanel(email: string, firstName:string, lastName:string, stripeUser: Stripe.Customer): Promise<Customer> {
+        const insId = uuidv4() as UUID;
+
+        const pteroUser = await pteroClient.createUser({
+            email: email, firstName: firstName, lastName: lastName, username: firstName+lastName
+
+        }).catch(err => {throw err})
+        const name = firstName+lastName;
+
+        const result = await query('INSERT INTO customer (id, email, name, stripe_customer_id, pterodactyl_user_id) VALUES (?, ?, ?, ?, ?)',
+            [insId, email, name, stripeUser.id, pteroUser.id]).catch(error => {
+            if (error.code === "ER_DUP_ENTRY") {
+                const field = error.message.split("'")[1];
+                throw new DuplicateError('Customer', {
+                    values: {
+                        insId,
+                        email,
+                        name
+                    }
+                }, error)
+            }
+            throw error;
+        })
+        return new Customer(insId, email, firstName+lastName, stripeUser.id, pteroUser.id);
+    }
+
+    async createFromStripe(customer: Stripe.Customer): Promise<Customer> {
+        const insId = uuidv4() as UUID;
+
+        const firstName = customer.name.split(" ")[0]
+        const lastName = customer.name.split(" ")[1]
+        const name = firstName+lastName;
+
+
+        const pteroUser = await pteroClient.createUser({
+            email: customer.email, firstName: firstName, lastName: lastName, username: firstName+lastName
+
+        }).catch(err => {throw err})
+
+
+        const result = await query('INSERT INTO customer (id, email, name, stripe_customer_id, pterodactyl_user_id) VALUES (?, ?, ?, ?, ?)',
+            [insId, customer.email, name, customer.id, pteroUser.id]).catch(error => {
+            if (error.code === "ER_DUP_ENTRY") {
+                const field = error.message.split("'")[1];
+                throw new DuplicateError('Customer', {
+                    values: {
+                        insId,
+                        name
+                    }
+                }, error)
+            }
+            throw error;
+        })
+        return new Customer(insId, customer.email, firstName+lastName, customer.id, pteroUser.id);
     }
 
     async getCustomerByEmail(email: string): Promise<Customer | undefined> {

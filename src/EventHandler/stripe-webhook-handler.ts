@@ -106,40 +106,26 @@ export async function handleWebhook(request, response) {
         }
         case 'customer.subscription.created': {
             const subServers:number[] = [];
-            let step = 0;
             try {
-                step++
-                console.log(step)
                 const subscription = event.data.object as Stripe.Subscription;
                 const customerId = subscription.customer as string;
                 const customer = await stripe.customers.retrieve(customerId);
-                step++
-                console.log(step)
                 // Get customer information from a database using Stripe customer ID
                 const stripeCustomer = await stripeApi.getCustomer(customer.id);
                 const customerObj = await customerApi.getCustomerByStripeId(customer.id);
                 const pteroUser = await pteroClient.getUser(String(customerObj.pterodactyl_user_id));
-                step++
-                console.log(step)
                 // Loop through subscription items and create a server for each
                 for (const item of subscription.items.data) {
                     for (let i = 0; i < item.quantity; i++) {
-                        step++
-                        console.log(step)
                         const productId = item.price.product;
                         const plansFDB = await query('SELECT * FROM plan where stripe_product_id = ?', [productId])
                         const plan = plansFDB[0]
-                        step++
-                        console.log(step)
                         const node: Pterodactyl.Node = await pteroClient.getNode(String((await findAvailableNode(pteroClient, plan.memory))[0]))
                             .catch(e => {
                             response.status(200).json({status: 'canceled'});
                             return undefined;
                         })
                         if (!node) return response.status(500).json({status: 'canceled'});
-                        //6
-                        step++
-                        console.log(step)
                         // Create a new server using Pterodactyl API
                         const availableAllocations = (await node.getAllocations())
                             .filter(allocation => allocation.assigned === false)
@@ -180,9 +166,6 @@ export async function handleWebhook(request, response) {
                             console.error(e)
                         });
 
-                        step++
-                        console.log(step)
-
                         if (newServer instanceof Server) {
                             subServers.push(newServer.id)
                             console.log(`New server created with id` + newServer.id);
@@ -200,6 +183,23 @@ export async function handleWebhook(request, response) {
                 });
             } catch (e) {
                 console.error(e)
+            }
+
+            break;
+        }
+
+        case 'customer.created': {
+            const subscription = event.data.object as Stripe.Subscription;
+            const customerId = subscription.customer as string;
+            const customer = await stripe.customers.retrieve(customerId);
+
+            const stripeCustomer = await stripeApi.getCustomer(customer.id);
+
+            let customerA = await customerApi.getCustomerByStripeId(stripeCustomer.id).catch(err => {return null});
+
+            if (!customerA) {
+                // @ts-ignore
+                customerA = await customerApi.createFromStripe(customer).catch(err => {return null})
             }
 
             break;

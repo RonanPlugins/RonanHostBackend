@@ -35,6 +35,49 @@ export default class CustomerRepository {
         });
         return new Customer(insId, email, firstName + lastName, stripeUser.id, pteroUser.id);
     }
+    async createWithPanel(email, firstName, lastName, stripeUser) {
+        const insId = uuidv4();
+        const pteroUser = await pteroClient.createUser({
+            email: email, firstName: firstName, lastName: lastName, username: firstName + lastName
+        }).catch(err => { throw err; });
+        const name = firstName + lastName;
+        const result = await query('INSERT INTO customer (id, email, name, stripe_customer_id, pterodactyl_user_id) VALUES (?, ?, ?, ?, ?)', [insId, email, name, stripeUser.id, pteroUser.id]).catch(error => {
+            if (error.code === "ER_DUP_ENTRY") {
+                const field = error.message.split("'")[1];
+                throw new DuplicateError('Customer', {
+                    values: {
+                        insId,
+                        email,
+                        name
+                    }
+                }, error);
+            }
+            throw error;
+        });
+        return new Customer(insId, email, firstName + lastName, stripeUser.id, pteroUser.id);
+    }
+    async createFromStripe(customer) {
+        const insId = uuidv4();
+        const firstName = customer.name.split(" ")[0];
+        const lastName = customer.name.split(" ")[1];
+        const name = firstName + lastName;
+        const pteroUser = await pteroClient.createUser({
+            email: customer.email, firstName: firstName, lastName: lastName, username: firstName + lastName
+        }).catch(err => { throw err; });
+        const result = await query('INSERT INTO customer (id, email, name, stripe_customer_id, pterodactyl_user_id) VALUES (?, ?, ?, ?, ?)', [insId, customer.email, name, customer.id, pteroUser.id]).catch(error => {
+            if (error.code === "ER_DUP_ENTRY") {
+                const field = error.message.split("'")[1];
+                throw new DuplicateError('Customer', {
+                    values: {
+                        insId,
+                        name
+                    }
+                }, error);
+            }
+            throw error;
+        });
+        return new Customer(insId, customer.email, firstName + lastName, customer.id, pteroUser.id);
+    }
     async getCustomerByEmail(email) {
         const rows = await query('SELECT * FROM customer WHERE email = ?', [email]);
         if (rows.length === 0) {

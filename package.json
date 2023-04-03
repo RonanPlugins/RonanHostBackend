@@ -6,6 +6,7 @@
     "dist"
   ],
   "scripts": {
+    "start": "node app.js",
     "build": "tsc",
     "dev": "node app.js"
   },

@@ -1,14 +1,19 @@
 import express from "express";
 import { query } from "../repositories/database.js";
-import pteroClient from "../util/external/builds/PterodactylClient.js";
 import randomResponse from "../util/message/checkLoggedInFailedResponse.js";
 import CustomerRepository from "../repositories/CustomerRepository.js";
 import Stripe from "stripe";
 import MissingValuesError from "../Error/MissingValuesError.js";
-import { findAvailableNode } from "../util/nodes/NodeAllocator";
-import Server from "../models/Server";
+import { findAvailableNode } from "../util/nodes/NodeAllocator.js";
+import Server from "../models/Server.js";
+// const pteroClient = new Pterodactyl.Builder()
+//     .setURL(process.env.PTERODACTYL_BASE_URL)
+//     .setAPIKey(process.env.PTERODACTYL_API_KEY)
+//     .asAdmin();
+import pteroClient from "../util/external/builds/PterodactylClient.js";
 const stripe = new Stripe(process.env.STRIPE_API_KEY, { apiVersion: "2022-11-15" });
 const router = express.Router();
+export default router;
 const customerApi = new CustomerRepository();
 function checkLoggedIn(req, res, next) {
     if (req?.user)
@@ -16,9 +21,9 @@ function checkLoggedIn(req, res, next) {
     else
         return res.status(403).json({ error: true, message: randomResponse().message });
 }
-/////////////////////////////////////////
+//////////////////////////////////////////
 // Protected from non-logged-in users. //
-/////////////////////////////////////////
+////////////////////////////////////////
 router.post('/create', checkLoggedIn, async function (req, res, next) {
     const session_user_id = req?.user?.id;
     console.log("Create server");

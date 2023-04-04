@@ -3,9 +3,10 @@
     "target": "es2020",
     "moduleResolution": "node",
     "module": "es2020",
+    "outDir": "dist",
     "declaration": true,
     "esModuleInterop": true,
     "sourceMap": false
   },
-  "exclude": ["src"]
+  "include": ["src"]
 }

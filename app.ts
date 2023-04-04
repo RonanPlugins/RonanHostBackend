@@ -2,19 +2,20 @@ import express from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv"
 dotenv.config()
-import Pterodactyl, {Server} from "@avionrx/pterodactyl-js"
 import {handleWebhook} from "./src/EventHandler/stripe-webhook-handler.js";
 
 const app = express();
 
-app.post('/webhooks/stripe', handleWebhook);
+app.post('/webhooks/stripe', bodyParser.raw({ type: 'application/json' }), handleWebhook);
 
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-import ServerController from './src/models/controllers/ServerController.js';
+import ServerController from './src/controllers/ServerController.js';
 app.use('/server', ServerController);
+
+
 app.get("/", (req, res) => {
     res.send("Hello, world!");
 });

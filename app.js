@@ -28,12 +28,18 @@ app.use(function (req, res, next) {
 });
 
 
-app.use(bodyParser.raw({ type: 'application/json' }));
+app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+// app.use(bodyParser.raw({ type: 'application/json' }));
 app.post('/webhooks/stripe', handleWebhook);
 
 import BannerController from './src/models/controllers/BannerController.js';
 app.use('/banner', BannerController);
 
+import ServerController from './src/models/controllers/ServerController.js';
+app.use('/server', ServerController);
 
 app.get("/", (req, res) => {
     res.send("Hello, world!");

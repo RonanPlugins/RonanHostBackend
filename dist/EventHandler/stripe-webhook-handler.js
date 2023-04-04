@@ -9,6 +9,9 @@ const pteroClient = new Pterodactyl.Builder()
     .setURL(process.env.PTERODACTYL_BASE_URL)
     .setAPIKey(process.env.PTERODACTYL_API_KEY)
     .asAdmin();
+
+module.exports = pteroClient;
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2022-11-15',
 });

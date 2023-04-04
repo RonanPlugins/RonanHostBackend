@@ -6,7 +6,7 @@ const stripe = new Stripe(process.env.STRIPE_API_KEY, { apiVersion: "2022-11-15"
 import dotenv from "dotenv";
 dotenv.config();
 import Pterodactyl, { Server } from '@avionrx/pterodactyl-js';
-import { findAvailableNode } from "../util/node/NodeAllocator.js";
+import { findAvailableNode } from "../util/nodes/NodeAllocator.js";
 const pteroClient = new Pterodactyl.Builder()
     .setURL(process.env.PTERODACTYL_BASE_URL)
     .setAPIKey(process.env.PTERODACTYL_API_KEY)

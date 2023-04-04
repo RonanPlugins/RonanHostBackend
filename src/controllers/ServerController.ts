@@ -25,10 +25,10 @@ router.post('/create', checkLoggedIn, async function (req, res, next) {
     const session_user_id = req?.user?.id;
     console.log("Create server")
 
-    const { name, ram, version, backups, databases } = req.body || null;
+    const { name, ram, version, disk, cpu, allocations = 0, backups, databases } = req.body || null;
 
     //NEW
-    const missingValues:string[] = ['name', 'ram', 'version', 'backups', 'databases'].filter(key => !req.body[key]);
+    const missingValues:string[] = ['name', 'ram', 'version', 'disk', 'cpu', 'backups', 'databases'].filter(key => !req.body[key]);
     if (missingValues.length > 0) {
         const MVE = new MissingValuesError(missingValues);
         res.status(MVE.statusCode).body({error: MVE})
@@ -47,7 +47,6 @@ router.post('/create', checkLoggedIn, async function (req, res, next) {
     });
     const plan = (await query("SELECT * FROM plan WHERE stripe_product_id = ?", [subscriptions.data[0].items.data[0].id]))[0]
 
-    const specRatio = plan.memory/ram
     const node: Pterodactyl.Node = await pteroClient.getNode(String((await findAvailableNode(pteroClient, plan.memory))[0]))
         .catch(e => {
             return undefined;
@@ -57,7 +56,7 @@ router.post('/create', checkLoggedIn, async function (req, res, next) {
         .slice(0, plan.allocations + 1);
 
     const defaultAllocation = availableAllocations[0];
-    const additionalAllocations = availableAllocations.slice(1, plan.allocations + 1)
+    const additionalAllocations = availableAllocations.slice(1, allocations)
         .map(allocation => allocation.id);
 
     const newServer = await pteroClient.createServer({
@@ -68,7 +67,7 @@ router.post('/create', checkLoggedIn, async function (req, res, next) {
         environment: { "SERVER_JARFILE": "server.jar", "BUILD_NUMBER": version},
         featureLimits: featureLimits,
         image: "quay.io/pterodactyl/core:java",
-        limits: { memory: ram, swap: plan.swap, disk: (plan.disk*specRatio), io: plan.io, cpu: (plan.cpu *specRatio)},
+        limits: { memory: ram, swap: plan.swap, disk: disk, io: plan.io, cpu: cpu},
         name: name,
         outOfMemoryKiller: false,
         skipScripts: false,
@@ -81,4 +80,49 @@ router.post('/create', checkLoggedIn, async function (req, res, next) {
     })
     // @ts-ignore
     res.send({success: true, server: new Server(...Object.values(newServer))});
+})
+
+interface update {
+    [key: string]: string;
+}
+
+// Pass updates as JSON.stringify()
+// Example for updates
+//
+router.post('/update', checkLoggedIn, async function (req, res, next) {
+    const session_user_id = req?.user?.id;
+    console.log("Create server")
+
+    const missingValues:string[] = ['updates', 'server'].filter(key => !req.body[key]);
+    if (missingValues.length > 0) {
+        const MVE = new MissingValuesError(missingValues);
+        res.status(MVE.statusCode).body({error: MVE})
+    }
+
+    const server = req.body.server;
+    const updatesArray: update[] = JSON.parse(req.body.updates);
+
+    const serFu = await pteroClient.getServer(String(server));
+
+    for (const update of updatesArray) {
+        for (const key in update) {
+            switch (key) {
+                case 'ram':
+                    await serFu.setMemory(Number(update.ram));
+                    break;
+                case 'disk':
+                    await serFu.setDisk(Number(update.disk));
+                    break;
+                case 'cpu':
+                    await serFu.setCPU(Number(update.cpu));
+                    break;
+                case 'backups':
+                    await serFu.setDatabaseAmount(Number(update.databases));
+                    break;
+                // add cases for other properties as needed
+            }
+        }
+    }
+    res.status(200).json({success: true})
+
 })

@@ -3,11 +3,13 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv";
 dotenv.config();
 import { handleWebhook } from "./src/EventHandler/stripe-webhook-handler.js";
-// // Imports local
-// import { handleStripeWebhook } from './src/controllers/handleStripeWebhook';
 const app = express();
-app.use(bodyParser.raw({ type: 'application/json' }));
 app.post('/webhooks/stripe', handleWebhook);
+app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+import ServerController from './src/models/controllers/ServerController.js';
+app.use('/server', ServerController);
 app.get("/", (req, res) => {
     res.send("Hello, world!");
 });

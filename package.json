@@ -16,10 +16,30 @@
     "@types/dotenv": "^8.2.0",
     "@types/stripe": "^8.0.417",
     "@types/uuid": "^9.0.1",
+    "cors": "^2.8.5",
     "express": "^4.18.2",
+    "express-mysql-session": "^3.0.0",
+    "express-session": "^1.17.3",
+    "js-yaml": "^4.1.0",
     "mysql": "^2.18.1",
     "pterodactyl.js": "^2.1.1",
     "uuid": "^9.0.0"
+  },
+  "imports": {
+    "#User": "./models/User.js",
+    "#repositories/*": [
+      "./models/repositories/*.js",
+      "./models/repositories/*.ts"
+    ],
+    "#services/*": [
+      "./models/services/*.js",
+      "./models/services/*.ts"
+    ],
+    "#NotFoundError": "./models/Error/NotFoundError.js",
+    "#DuplicateError": "./models/Error/DuplicateError.js",
+    "#MissingValuesError": "./models/Error/MissingValuesError.js",
+    "#config": "./config.js",
+    "#database": "./lib/functions/database/db.js"
   },
   "devDependencies": {
     "@types/mysql": "^2.15.21",

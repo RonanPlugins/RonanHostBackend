@@ -6,7 +6,25 @@
     "outDir": "dist",
     "declaration": false,
     "esModuleInterop": true,
-    "sourceMap": false
+    "sourceMap": false,
+    "paths": {
+      "#User": ["./models/User.js"],
+      "#repositories/*": [
+        "./models/repositories/*.js",
+        "./models/repositories/*.ts"
+      ],
+      "#services/*": [
+        "./models/services/*.js",
+        "./models/services/*.ts"
+      ],
+      "#NotFoundError": ["./models/Error/NotFoundError.js"],
+      "#DuplicateError": ["./models/Error/DuplicateError.js"],
+      "#MissingValuesError": ["./models/Error/MissingValuesError.js"],
+      "#config": ["./config.js"],
+      "#database": ["./lib/functions/database/db.js"]
+    }
   },
-  "include": ["src"]
+  "include": [
+    "src"
+  ]
 }

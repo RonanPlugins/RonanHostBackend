@@ -1,0 +1,34 @@
+##########################################
+#     **Config.yml** RonanHost API       #
+#     Do NOT put any confidential data   #
+#              In this file.             #
+##########################################
+
+
+# The URL of the main frontend server.
+# Type: String
+# Default: http://localhost:3000
+Frontend_URL: "http://localhost:3000"
+
+# The domain used for the stripe endpoint
+# Type: String
+# Default: http://localhost:3001/stripe
+Stripe_Domain: "http://localhost:3001/stripe"
+
+# Express / server configs
+app_port: 3006
+production: true
+
+# The domain used for the hosting panel
+# Type: String
+# Default: https://panel.ronanplugins.com/api/application
+pterodactyl_URL: "https://panel.ronanplugins.com/api/application"
+
+
+# CORS configuration
+
+allowedOrigins: [
+  "http://localhost:3000",
+  "https://ronanplugins.com",
+  "https://api.ronanplugins.com",
+]

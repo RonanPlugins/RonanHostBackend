@@ -3,7 +3,6 @@
     "target": "es2020",
     "moduleResolution": "node",
     "module": "es2020",
-    "outDir": "dist",
     "declaration": false,
     "esModuleInterop": true,
     "sourceMap": false,
@@ -25,6 +24,7 @@
     }
   },
   "include": [
-    "src"
+    "src",
+    "app.ts"
   ]
 }

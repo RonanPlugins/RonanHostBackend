@@ -1,4 +1,4 @@
-import Base from "#repositories/Base";
+import Base from "./Base.js";
 import StripeApiClient from "#stripe-api-client";
 import Pterodactyl from "@avionrx/pterodactyl-js";
 import dotenv from "dotenv";

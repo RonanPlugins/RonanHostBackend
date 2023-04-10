@@ -1,6 +1,7 @@
 import {UUID} from "../types/UUID";
 import Pterodactyl from "@avionrx/pterodactyl-js";
 import dotenv from "dotenv"
+import Base from "./Base.js";
 dotenv.config()
 
 
@@ -9,8 +10,7 @@ const pteroClient = new Pterodactyl.Builder()
     .setAPIKey(process.env.PTERODACTYL_API_KEY)
     .asAdmin();
 
-export class User {
-    private _id: UUID;
+export class User extends Base {
     private _email: string;
     private _name: string;
     private _pterodactyl_user_id: number;
@@ -19,7 +19,7 @@ export class User {
     private _stripe_customer: any;
 
     constructor(id: UUID, email: string, name: string, pterodactyl_user_id: number, stripe_customer_id: string) {
-        this._id = id;
+        super(id)
         this._email = email;
         this._name = name;
         this._pterodactyl_user_id = pterodactyl_user_id;
@@ -31,6 +31,7 @@ export class User {
     }
 
     protected get pterodactyl_user(): any {
+
         if (!this._pterodactyl_user) {
             return this.loadPterodactylUser();
         }
@@ -64,14 +65,6 @@ export class User {
         this._pterodactyl_user_id = value;
     }
 
-    get id(): UUID {
-        return this._id;
-    }
-
-    set id(value: UUID) {
-        this._id = value;
-    }
-
     get email(): string {
         return this._email;
     }
@@ -87,4 +80,5 @@ export class User {
     set name(value: string) {
         this._name = value;
     }
+
 }

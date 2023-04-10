@@ -1,13 +1,14 @@
 import Pterodactyl from "@avionrx/pterodactyl-js";
 import dotenv from "dotenv";
+import Base from "./Base.js";
 dotenv.config();
 const pteroClient = new Pterodactyl.Builder()
     .setURL(process.env.PTERODACTYL_BASE_URL)
     .setAPIKey(process.env.PTERODACTYL_API_KEY)
     .asAdmin();
-export class User {
+export class User extends Base {
     constructor(id, email, name, pterodactyl_user_id, stripe_customer_id) {
-        this._id = id;
+        super(id);
         this._email = email;
         this._name = name;
         this._pterodactyl_user_id = pterodactyl_user_id;
@@ -43,12 +44,6 @@ export class User {
     }
     set pterodactyl_user_id(value) {
         this._pterodactyl_user_id = value;
-    }
-    get id() {
-        return this._id;
-    }
-    set id(value) {
-        this._id = value;
     }
     get email() {
         return this._email;

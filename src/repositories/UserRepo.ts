@@ -1,4 +1,4 @@
-import Base from "#repositories/Base";
+import Base from "./Base.js"
 import { query } from '#data/database';
 import type {UUID} from '../types/UUID';
 import { v4 as uuidv4 } from 'uuid';

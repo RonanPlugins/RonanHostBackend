@@ -39,4 +39,3 @@ export async function logout(request, response, next) {
         request.logOut(error => error ? next(error) : response.sendStatus(200));
     });
 }
-//# sourceMappingURL=UserController.js.map

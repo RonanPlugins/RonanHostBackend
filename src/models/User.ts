@@ -1,7 +1,8 @@
 import {UUID} from "../types/UUID";
 import Pterodactyl from "@avionrx/pterodactyl-js";
 import dotenv from "dotenv"
-import Base from "./Base.js";
+import BaseModel, {RequiredFields} from "./Base/BaseModel.js";
+import {AutoAccessor, AutoAccessors} from "#decorators/AutoAccessor";
 dotenv.config()
 
 
@@ -10,20 +11,31 @@ const pteroClient = new Pterodactyl.Builder()
     .setAPIKey(process.env.PTERODACTYL_API_KEY)
     .asAdmin();
 
-export class User extends Base {
-    private _email: string;
-    private _name: string;
-    private _pterodactyl_user_id: number;
+export interface UserRequiredFields extends RequiredFields{
+    email: string,
+    name: string,
+    password: string
+}
+export class User extends BaseModel<UserRequiredFields> {
+    required: UserRequiredFields
+
+    @AutoAccessor()
+    public email: string;
+    @AutoAccessor()
+    public name: string;
+    @AutoAccessor()
+    public readonly pterodactyl_user_id: number;
     private _pterodactyl_user: any;
-    private _stripe_customer_id: string;
+    @AutoAccessor()
+    public stripe_customer_id: string;
     private _stripe_customer: any;
 
     constructor(id: UUID, email: string, name: string, pterodactyl_user_id: number, stripe_customer_id: string) {
         super(id)
-        this._email = email;
-        this._name = name;
-        this._pterodactyl_user_id = pterodactyl_user_id;
-        this._stripe_customer_id = stripe_customer_id;
+        this.email = email;
+        this.name = name;
+        this.pterodactyl_user_id = pterodactyl_user_id;
+        this.stripe_customer_id = stripe_customer_id;
     }
 
     protected async loadPterodactylUser(): Promise<void> {
@@ -47,38 +59,6 @@ export class User extends Base {
             return this.loadStripeCustomer();
         }
         return this._stripe_customer;
-    }
-
-    get stripe_customer_id(): string {
-        return this._stripe_customer_id;
-    }
-
-    set stripe_customer_id(value: string) {
-        this._stripe_customer_id = value;
-    }
-
-    get pterodactyl_user_id(): number {
-        return this._pterodactyl_user_id;
-    }
-
-    set pterodactyl_user_id(value: number) {
-        this._pterodactyl_user_id = value;
-    }
-
-    get email(): string {
-        return this._email;
-    }
-
-    set email(value: string) {
-        this._email = value;
-    }
-
-    get name(): string {
-        return this._name;
-    }
-
-    set name(value: string) {
-        this._name = value;
     }
 
 }

@@ -12,4 +12,3 @@ router.get("/", async function (req, res, next) {
     }
 });
 export default router;
-//# sourceMappingURL=BannerController.js.map

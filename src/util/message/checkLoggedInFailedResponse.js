@@ -10,4 +10,3 @@ const responses = [
 export default function random() {
     return responses[Math.floor(Math.random() * responses.length)];
 }
-//# sourceMappingURL=checkLoggedInFailedResponse.js.map

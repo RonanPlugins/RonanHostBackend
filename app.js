@@ -48,4 +48,3 @@ app.get("/", (req, res) => {
 app.listen(config.app_port, async () => {
     console.log("Server listening on port 3006");
 });
-//# sourceMappingURL=app.js.map

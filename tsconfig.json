@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "experimentalDecorators": true,
     "target": "es2020",
     "moduleResolution": "node",
     "module": "es2020",
@@ -7,13 +8,20 @@
     "esModuleInterop": true,
     "strictPropertyInitialization": false,
     "skipLibCheck": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "paths": {
       "#User": ["./src/models/User.js"],
+      "#UUID": ["./src/types/UUID.js"],
       "#repositories/*": [
         "./src/repositories/*.js",
         "./src/repositories/*.ts",
       ],
+      "#models/*": [
+        "./src/models/*.js",
+        "./src/models/*.ts"
+      ],
+      "#baseRepository": ["./src/repositories/Base/BaseRepository.js"],
+      "#baseService": ["./src/services/Base/BaseService.js"],
       "#services/*": [
         "./src/services/*.js",
         "./src/services/*.ts"
@@ -22,12 +30,20 @@
         "./src/util/data/*.js",
         "./src/util/data/*.ts"
       ],
+      "#decorators/*": [
+        "./src/util/decorators/*.ts",
+        "./src/util/decorators/*.js"
+      ],
+      "#errors/*": [
+        "./src/Error/*.ts",
+        "./src/Error/*.js"
+      ],
       "#NotFoundError": ["./src/Error/NotFoundError.js"],
       "#DuplicateError": ["./src/Error/DuplicateError.js"],
       "#MissingValuesError": ["./src/Error/MissingValuesError.js"],
       "#config": ["./src/config.js"],
       "#database": ["./src/util/data/database.js"],
-      "#crypto": ["./src/util/security.js"],
+      "#crypto": ["./src/util/security/crypto.js"],
       "#stripe-api-client": ["./src/util/external/clients/stripe-api-client.js"]
     }
   },

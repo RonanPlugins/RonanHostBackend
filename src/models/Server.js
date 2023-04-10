@@ -100,4 +100,3 @@ export default class Server {
         this._user = value;
     }
 }
-//# sourceMappingURL=Server.js.map

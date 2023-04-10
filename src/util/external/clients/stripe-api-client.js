@@ -47,4 +47,3 @@ export default class StripeApiClient {
         await this.stripe.customers.del(customerId);
     }
 }
-//# sourceMappingURL=stripe-api-client.js.map

@@ -14,4 +14,3 @@ const config = (() => {
     }
 })();
 export { config };
-//# sourceMappingURL=config.js.map

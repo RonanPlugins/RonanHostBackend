@@ -18,4 +18,3 @@ export const query = (sql, params) => new Promise((resolve, reject) => {
         }
     });
 });
-//# sourceMappingURL=database.js.map

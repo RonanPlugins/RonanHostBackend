@@ -50,4 +50,3 @@ export default class PageRepository {
         return insertId;
     }
 }
-//# sourceMappingURL=PageRepository.js.map

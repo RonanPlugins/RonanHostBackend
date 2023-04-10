@@ -3,4 +3,3 @@ export const newUUID = () => uuidv4();
 export const validateUUID = (value) => {
     return typeof value === 'string' && /^[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$/i.test(value);
 };
-//# sourceMappingURL=UUID.js.map

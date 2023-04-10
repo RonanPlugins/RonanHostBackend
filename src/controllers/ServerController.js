@@ -110,4 +110,3 @@ router.post('/update', checkLoggedIn, async function (req, res, next) {
     }
     res.status(200).json({ success: true });
 });
-//# sourceMappingURL=ServerController.js.map

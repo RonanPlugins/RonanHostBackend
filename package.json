@@ -26,29 +26,61 @@
     "powerbi-client": "^2.22.2",
     "pterodactyl.js": "^2.1.1",
     "stripe": "^12.0.0",
+    "typeorm": "^0.3.14",
     "uuid": "^9.0.0"
   },
   "imports": {
-    "#User": ["./src/models/User.js"],
+    "#User": [
+      "./src/models/User.js"
+    ],
     "#repositories/*": [
-      "./src/repositories/*.js",
-      "./src/repositories/*.ts"
+      "./src/repositories/*.js"
+    ],
+    "#decorators/*": [
+      "./src/util/decorators/*.js"
     ],
     "#services/*": [
-      "./src/services/*.js",
-      "./src/services/*.ts"
+      "./src/services/*.js"
+    ],
+    "#models/*": [
+      "./src/models/*.js"
     ],
     "#data/*": [
-      "./src/util/data/*.js",
-      "./src/util/data/*.ts"
+      "./src/util/data/*.js"
     ],
-    "#NotFoundError": ["./src/Error/NotFoundError.js"],
-    "#DuplicateError": ["./src/Error/DuplicateError.js"],
-    "#MissingValuesError": ["./src/Error/MissingValuesError.js"],
-    "#config": ["./src/config.js"],
-    "#database": ["./src/util/data/database.js"],
-    "#crypto": ["./src/util/security/"],
-    "#stripe-api-client": ["./src/util/external/clients/stripe-api-client.js"]
+    "#errors/*": [
+      "./src/Error/*.js"
+    ],
+    "#NotFoundError": [
+      "./src/Error/NotFoundError.js"
+    ],
+    "#DuplicateError": [
+      "./src/Error/DuplicateError.js"
+    ],
+    "#MissingValuesError": [
+      "./src/Error/MissingValuesError.js"
+    ],
+    "#config": [
+      "./src/config.js"
+    ],
+    "#database": [
+      "./src/util/data/database.js"
+    ],
+    "#crypto": [
+      "./src/util/security/crypto.js"
+    ],
+    "#UUID": [
+      "./src/types/UUID.js"
+    ],
+    "#stripe-api-client": [
+      "./src/util/external/clients/stripe-api-client.js"
+    ],
+    "#baseRepository": [
+      "./src/repositories/Base/BaseRepository.js"
+    ],
+    "#baseService": [
+      "./src/services/Base/BaseService.js"
+    ]
   },
   "devDependencies": {
     "@types/mysql": "^2.15.21",

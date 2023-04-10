@@ -17,4 +17,3 @@ export default class SQLError extends Error {
         this._conflictingField = value;
     }
 }
-//# sourceMappingURL=SQLError.js.map

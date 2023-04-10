@@ -182,4 +182,3 @@ export async function handleWebhook(request, response) {
             console.log(`Unhandled event type: ${event.type}`);
     }
 }
-//# sourceMappingURL=stripe-webhook-handler.js.map

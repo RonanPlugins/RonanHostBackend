@@ -1,18 +1,25 @@
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
 import Pterodactyl from "@avionrx/pterodactyl-js";
 import dotenv from "dotenv";
-import Base from "./Base.js";
+import BaseModel from "./Base/BaseModel.js";
+import { AutoAccessor } from "#decorators/AutoAccessor";
 dotenv.config();
 const pteroClient = new Pterodactyl.Builder()
     .setURL(process.env.PTERODACTYL_BASE_URL)
     .setAPIKey(process.env.PTERODACTYL_API_KEY)
     .asAdmin();
-export class User extends Base {
+export class User extends BaseModel {
     constructor(id, email, name, pterodactyl_user_id, stripe_customer_id) {
         super(id);
-        this._email = email;
-        this._name = name;
-        this._pterodactyl_user_id = pterodactyl_user_id;
-        this._stripe_customer_id = stripe_customer_id;
+        this.email = email;
+        this.name = name;
+        this.pterodactyl_user_id = pterodactyl_user_id;
+        this.stripe_customer_id = stripe_customer_id;
     }
     async loadPterodactylUser() {
         this._pterodactyl_user = await pteroClient.getUser(String(this.pterodactyl_user_id));
@@ -33,29 +40,16 @@ export class User extends Base {
         }
         return this._stripe_customer;
     }
-    get stripe_customer_id() {
-        return this._stripe_customer_id;
-    }
-    set stripe_customer_id(value) {
-        this._stripe_customer_id = value;
-    }
-    get pterodactyl_user_id() {
-        return this._pterodactyl_user_id;
-    }
-    set pterodactyl_user_id(value) {
-        this._pterodactyl_user_id = value;
-    }
-    get email() {
-        return this._email;
-    }
-    set email(value) {
-        this._email = value;
-    }
-    get name() {
-        return this._name;
-    }
-    set name(value) {
-        this._name = value;
-    }
 }
-//# sourceMappingURL=User.js.map
+__decorate([
+    AutoAccessor()
+], User.prototype, "email", void 0);
+__decorate([
+    AutoAccessor()
+], User.prototype, "name", void 0);
+__decorate([
+    AutoAccessor()
+], User.prototype, "pterodactyl_user_id", void 0);
+__decorate([
+    AutoAccessor()
+], User.prototype, "stripe_customer_id", void 0);

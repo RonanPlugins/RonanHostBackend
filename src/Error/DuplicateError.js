@@ -10,4 +10,3 @@ export default class DuplicateError extends SQLError {
         this.emotion = "annoyed";
     }
 }
-//# sourceMappingURL=DuplicateError.js.map

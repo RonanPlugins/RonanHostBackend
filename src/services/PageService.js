@@ -16,4 +16,3 @@ export default class PageService {
         return await this.find(page_id);
     }
 }
-//# sourceMappingURL=PageService.js.map

@@ -8,4 +8,3 @@ export default class crypto {
         return await bcrypt.compare(content, hash);
     }
 }
-//# sourceMappingURL=crypto.js.map

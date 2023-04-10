@@ -30,3 +30,4 @@ export default class Page {
         };
     }
 }
+//# sourceMappingURL=Page.js.map

@@ -1,5 +1,5 @@
 import express from "express";
-import { query } from "../repositories/database";
+import { query } from "../util/data/database";
 const router = express.Router();
 router.get("/", async function (req, res, next) {
     try {
@@ -12,3 +12,4 @@ router.get("/", async function (req, res, next) {
     }
 });
 export default router;
+//# sourceMappingURL=BannerController.js.map

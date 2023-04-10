@@ -5,23 +5,28 @@
     "module": "es2020",
     "declaration": false,
     "esModuleInterop": true,
-    "sourceMap": false,
+    "sourceMap": true,
     "paths": {
       "#User": ["./src/models/User.js"],
       "#repositories/*": [
         "./src/repositories/*.js",
-        "./src/repositories/*.ts"
+        "./src/repositories/*.ts",
       ],
       "#services/*": [
         "./src/services/*.js",
         "./src/services/*.ts"
       ],
+      "#data/*": [
+        "./src/util/data/*.js",
+        "./src/util/data/*.ts"
+      ],
       "#NotFoundError": ["./src/Error/NotFoundError.js"],
       "#DuplicateError": ["./src/Error/DuplicateError.js"],
       "#MissingValuesError": ["./src/Error/MissingValuesError.js"],
       "#config": ["./src/config.js"],
-      "#database": ["./src/lib/functions/database/db.js"],
-      "#crypto": ["./src/util/security/"]
+      "#database": ["./src/util/data/database.js"],
+      "#crypto": ["./src/util/security.js"],
+      "#stripe-api-client": ["./src/util/external/clients/stripe-api-client.js"]
     }
   },
   "include": [

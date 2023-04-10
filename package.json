@@ -1,13 +1,13 @@
 {
   "name": "RonanHost-Backend",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "type": "module",
   "files": [
     "dist"
   ],
   "scripts": {
     "start": "node app.js",
-    "build": "tsc",
+    "build": "tsc --build tsconfig.json",
     "dev": "node app.js"
   },
   "dependencies": {
@@ -25,23 +25,30 @@
     "mysql": "^2.18.1",
     "powerbi-client": "^2.22.2",
     "pterodactyl.js": "^2.1.1",
+    "stripe": "^12.0.0",
     "uuid": "^9.0.0"
   },
   "imports": {
-    "#User": "./models/User.js",
+    "#User": ["./src/models/User.js"],
     "#repositories/*": [
-      "./models/repositories/*.js",
-      "./models/repositories/*.ts"
+      "./src/repositories/*.js",
+      "./src/repositories/*.ts"
     ],
     "#services/*": [
-      "./models/services/*.js",
-      "./models/services/*.ts"
+      "./src/services/*.js",
+      "./src/services/*.ts"
     ],
-    "#NotFoundError": "./models/Error/NotFoundError.js",
-    "#DuplicateError": "./models/Error/DuplicateError.js",
-    "#MissingValuesError": "./models/Error/MissingValuesError.js",
-    "#config": "./config.js",
-    "#database": "./lib/functions/database/db.js"
+    "#data/*": [
+      "./src/util/data/*.js",
+      "./src/util/data/*.ts"
+    ],
+    "#NotFoundError": ["./src/Error/NotFoundError.js"],
+    "#DuplicateError": ["./src/Error/DuplicateError.js"],
+    "#MissingValuesError": ["./src/Error/MissingValuesError.js"],
+    "#config": ["./src/config.js"],
+    "#database": ["./src/util/data/database.js"],
+    "#crypto": ["./src/util/security/"],
+    "#stripe-api-client": ["./src/util/external/clients/stripe-api-client.js"]
   },
   "devDependencies": {
     "@types/mysql": "^2.15.21",

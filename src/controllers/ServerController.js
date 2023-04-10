@@ -1,5 +1,5 @@
 import express from "express";
-import { query } from "../repositories/database.js";
+import { query } from "#data/database";
 import randomResponse from "../util/message/checkLoggedInFailedResponse.js";
 import UserRepository from "../repositories/UserRepository.js";
 import Stripe from "stripe";
@@ -110,3 +110,4 @@ router.post('/update', checkLoggedIn, async function (req, res, next) {
     }
     res.status(200).json({ success: true });
 });
+//# sourceMappingURL=ServerController.js.map

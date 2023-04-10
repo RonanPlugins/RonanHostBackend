@@ -2,7 +2,7 @@ import UserRepository from "../repositories/UserRepository";
 import {User} from "../models/User";
 import {UUID} from "../types/UUID";
 
-class UserService {
+export default class UserService {
     private _userRepository: UserRepository;
     constructor(userRepository: UserRepository) {
         this._userRepository = userRepository;

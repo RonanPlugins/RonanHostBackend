@@ -1,7 +1,7 @@
-import { query } from './database.js';
+import { query } from '#data/database';
 import type {UUID} from '../types/UUID';
 import { v4 as uuidv4 } from 'uuid';
-import StripeApiClient from "../services/stripe-api-client.js";
+import StripeApiClient from "#stripe-api-client";
 import NotFoundError from "../Error/NotFoundError.js";
 import DuplicateError from "../Error/DuplicateError.js";
 import Pterodactyl from "@avionrx/pterodactyl-js";
@@ -60,6 +60,43 @@ export default class UserRepository {
         // @ts-ignore
         return new User(...Object.values(rows[0]));
     }
+
+    async fetchAll(...q:any) {
+        const { rows } = await query(`SELECT * FROM user ${q.map((x:any) => isNaN(x) ? 'WHERE name = ? OR email = ?' : 'WHERE id = ?').join(' OR ')}`, q.flatMap(x => isNaN(x) ? [x, x] : x));
+        // @ts-ignore
+        return rows.map((row:any) => new User(...Object.values(row)));
+    }
+    async fetchOne(...q: any) {
+        let placeholders = 'WHERE 1=1';
+        let values = [];
+
+        // Build the SQL query and values based on the arguments passed to the function
+        if (q.length) {
+            const conditions = [];
+            for (const arg of q) {
+                if (typeof arg === 'number') {
+                    conditions.push('id = ?');
+                    values.push(arg);
+                } else if (typeof arg === 'string') {
+                    conditions.push('(name = ? OR email = ?)');
+                    values.push(arg, arg);
+                }
+            }
+            placeholders = ' WHERE ' + conditions.join(' OR ');
+        }
+
+        // Execute the query with the built SQL and values
+        const { rows } = await query(`SELECT * FROM user ${placeholders} LIMIT 1`, values);
+
+        if (rows.length === 0) {
+            return undefined;
+        }
+
+        // @ts-ignore
+        return new User(...Object.values(rows[0]));
+    }
+
+
     async getById(id: UUID): Promise<User | undefined> {
         const rows = await query('SELECT * FROM user WHERE id = ?', [id]);
         if (rows.length === 0) {

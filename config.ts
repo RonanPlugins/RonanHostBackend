@@ -1,22 +1,19 @@
+// config.ts
 import yaml from 'js-yaml';
 import fs from 'fs';
 
-export interface appConfig {
-    Frontend_URL: string;
-    Stripe_Domain: string;
-    app_port: number;
-    production: boolean;
-    pterodactyl_URL: string;
-    allowedOrigins: string[];
+function loadConfig() {
+    return yaml.load(fs.readFileSync('./config.yml', 'utf8'));
 }
 
-
-
-export default (():appConfig => {
+type AppConfig = ReturnType<typeof loadConfig>;
+const config = (() => {
     try {
-        return yaml.load(fs.readFileSync('./config.yml', 'utf8'));
+        return loadConfig() as AppConfig;
     } catch (err) {
         console.error(err);
         return null;
     }
 })();
+
+export { AppConfig, config };

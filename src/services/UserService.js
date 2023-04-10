@@ -1,4 +1,4 @@
-class UserService {
+export default class UserService {
     constructor(userRepository) {
         this._userRepository = userRepository;
     }
@@ -30,4 +30,4 @@ class UserService {
         return await this.userRepository.delete(id).catch(e => { throw e; });
     }
 }
-export {};
+//# sourceMappingURL=UserService.js.map

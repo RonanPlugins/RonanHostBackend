@@ -7,3 +7,4 @@ export default class NoNodeAllocationsError extends Error {
     }
 }
 NoNodeAllocationsError.contact = "support@ronanplugins.com";
+//# sourceMappingURL=NoAllocationError.js.map

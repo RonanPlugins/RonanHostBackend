@@ -1,11 +1,17 @@
+// config.ts
 import yaml from 'js-yaml';
 import fs from 'fs';
-export default (() => {
+function loadConfig() {
+    return yaml.load(fs.readFileSync('./config.yml', 'utf8'));
+}
+const config = (() => {
     try {
-        return yaml.load(fs.readFileSync('./config.yml', 'utf8'));
+        return loadConfig();
     }
     catch (err) {
         console.error(err);
         return null;
     }
 })();
+export { config };
+//# sourceMappingURL=config.js.map

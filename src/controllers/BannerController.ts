@@ -1,5 +1,5 @@
 import express from "express";
-import { query } from "../repositories/database";
+import { query } from "../util/data/database";
 
 const router = express.Router();
 

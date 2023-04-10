@@ -63,3 +63,4 @@ export class User {
         this._name = value;
     }
 }
+//# sourceMappingURL=User.js.map

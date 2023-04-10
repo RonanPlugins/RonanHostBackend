@@ -10,3 +10,4 @@ export default class NotFoundError extends Error {
         this.emotion = "frustrated";
     }
 }
+//# sourceMappingURL=NotFoundError.js.map

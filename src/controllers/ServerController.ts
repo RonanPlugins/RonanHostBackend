@@ -1,8 +1,8 @@
 import express from "express";
-import { query } from "../repositories/database.js";
+import { query } from "#data/database";
 import Pterodactyl from "@avionrx/pterodactyl-js";
 import randomResponse from "../util/message/checkLoggedInFailedResponse.js"
-import StripeApiClient, { Customer } from "../services/stripe-api-client.js";
+import StripeApiClient, { Customer } from "../util/external/clients/stripe-api-client";
 import UserRepository from "../repositories/UserRepository.js";
 import Stripe from "stripe";
 import MissingValuesError from "../Error/MissingValuesError.js";

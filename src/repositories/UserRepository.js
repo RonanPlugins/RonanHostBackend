@@ -5,8 +5,8 @@ import NotFoundError from "../Error/NotFoundError.js";
 import DuplicateError from "../Error/DuplicateError.js";
 import Pterodactyl from "@avionrx/pterodactyl-js";
 import dotenv from "dotenv";
-import { User } from "../models/User";
-import crypto from "../util/security/crypto";
+import { User } from "../models/User.js";
+import crypto from "../util/security/crypto.js";
 dotenv.config();
 const pteroClient = new Pterodactyl.Builder()
     .setURL(process.env.PTERODACTYL_BASE_URL)

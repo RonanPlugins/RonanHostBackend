@@ -14,8 +14,8 @@ class UserService {
         this._userRepository = value;
     }
 
-    async create(email: string, firstName:string, lastName:string): Promise<User> {
-        return await this.userRepository.create(email, firstName, lastName).catch(e => {throw e})
+    async create(email: string, firstName:string, lastName:string, password: string): Promise<User> {
+        return await this.userRepository.create(email, firstName, lastName, password).catch(e => {throw e})
     }
 
     async getByEmail(email: string): Promise<User | undefined> {

@@ -3,7 +3,7 @@ import { query } from "../repositories/database.js";
 import Pterodactyl from "@avionrx/pterodactyl-js";
 import randomResponse from "../util/message/checkLoggedInFailedResponse.js"
 import StripeApiClient, { Customer } from "../services/stripe-api-client.js";
-import CustomerRepository from "../repositories/CustomerRepository.js";
+import UserRepository from "../repositories/UserRepository.js";
 import Stripe from "stripe";
 import MissingValuesError from "../Error/MissingValuesError.js";
 import {findAvailableNode} from "../util/nodes/NodeAllocator.js";
@@ -20,7 +20,7 @@ const stripe =new Stripe(process.env.STRIPE_API_KEY, {apiVersion: "2022-11-15"})
 const router = express.Router();
 
 export default router;
-const customerApi = new CustomerRepository()
+const userApi = new UserRepository()
 
 function checkLoggedIn(req, res, next) {
     if (req?.user) next(); else return res.status(403).json({ error: true, message: randomResponse().message});
@@ -46,7 +46,7 @@ router.post('/create', checkLoggedIn, async function (req, res, next) {
         allocations: 0, databases: databases, backups: backups
     }
 
-    const customerObj = await customerApi.getById(req?.user?.id);
+    const customerObj = await userApi.getById(req?.user?.id);
     const stripeCus = await stripe.customers.retrieve(customerObj.stripe_customer_id)
 
 

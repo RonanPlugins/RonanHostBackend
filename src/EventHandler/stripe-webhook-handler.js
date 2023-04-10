@@ -1,7 +1,7 @@
 import { query } from "../repositories/database.js";
 import Stripe from 'stripe';
 import StripeApiClient from "../services/stripe-api-client.js";
-import CustomerRepository from "../repositories/CustomerRepository.js";
+import CustomerRepository from "../repositories/UserRepository.js";
 const stripe = new Stripe(process.env.STRIPE_API_KEY, { apiVersion: "2022-11-15" });
 import dotenv from "dotenv";
 dotenv.config();

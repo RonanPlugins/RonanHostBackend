@@ -9,18 +9,19 @@
     "paths": {
       "#User": ["./models/User.js"],
       "#repositories/*": [
-        "./models/repositories/*.js",
-        "./models/repositories/*.ts"
+        "./repositories/*.js",
+        "./repositories/*.ts"
       ],
       "#services/*": [
-        "./models/services/*.js",
-        "./models/services/*.ts"
+        "./services/*.js",
+        "./services/*.ts"
       ],
-      "#NotFoundError": ["./models/Error/NotFoundError.js"],
-      "#DuplicateError": ["./models/Error/DuplicateError.js"],
-      "#MissingValuesError": ["./models/Error/MissingValuesError.js"],
+      "#NotFoundError": ["./Error/NotFoundError.js"],
+      "#DuplicateError": ["./Error/DuplicateError.js"],
+      "#MissingValuesError": ["./Error/MissingValuesError.js"],
       "#config": ["./config.js"],
-      "#database": ["./lib/functions/database/db.js"]
+      "#database": ["./lib/functions/database/db.js"],
+      "#crypto": ["./util/security/"]
     }
   },
   "include": [

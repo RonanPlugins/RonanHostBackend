@@ -1,7 +1,7 @@
 import express from "express";
 import { query } from "../repositories/database.js";
 import randomResponse from "../util/message/checkLoggedInFailedResponse.js";
-import CustomerRepository from "../repositories/CustomerRepository.js";
+import UserRepository from "../repositories/UserRepository.js";
 import Stripe from "stripe";
 import MissingValuesError from "../Error/MissingValuesError.js";
 import { findAvailableNode } from "../util/nodes/NodeAllocator.js";
@@ -14,7 +14,7 @@ import pteroClient from "../util/external/builds/PterodactylClient.js";
 const stripe = new Stripe(process.env.STRIPE_API_KEY, { apiVersion: "2022-11-15" });
 const router = express.Router();
 export default router;
-const customerApi = new CustomerRepository();
+const userApi = new UserRepository();
 function checkLoggedIn(req, res, next) {
     if (req?.user)
         next();
@@ -37,7 +37,7 @@ router.post('/create', checkLoggedIn, async function (req, res, next) {
     const featureLimits = {
         allocations: 0, databases: databases, backups: backups
     };
-    const customerObj = await customerApi.getById(req?.user?.id);
+    const customerObj = await userApi.getById(req?.user?.id);
     const stripeCus = await stripe.customers.retrieve(customerObj.stripe_customer_id);
     const subscriptions = await stripe.subscriptions.list({
         customer: stripeCus.id,

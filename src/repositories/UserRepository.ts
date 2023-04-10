@@ -7,9 +7,9 @@ import DuplicateError from "../Error/DuplicateError.js";
 import Pterodactyl from "@avionrx/pterodactyl-js";
 import Stripe from "stripe";
 import dotenv from "dotenv"
-import {User} from "../models/User";
+import {User} from "../models/User.js";
 import {createHash} from "crypto";
-import crypto from "../util/security/crypto";
+import crypto from "../util/security/crypto.js";
 
 dotenv.config()
 

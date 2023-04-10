@@ -8,8 +8,8 @@ class UserService {
     set userRepository(value) {
         this._userRepository = value;
     }
-    async create(email, firstName, lastName) {
-        return await this.userRepository.create(email, firstName, lastName).catch(e => { throw e; });
+    async create(email, firstName, lastName, password) {
+        return await this.userRepository.create(email, firstName, lastName, password).catch(e => { throw e; });
     }
     async getByEmail(email) {
         return await this.userRepository.getByEmail(email).catch(e => { throw e; });

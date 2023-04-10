@@ -7,21 +7,21 @@
     "esModuleInterop": true,
     "sourceMap": false,
     "paths": {
-      "#User": ["./models/User.js"],
+      "#User": ["./src/models/User.js"],
       "#repositories/*": [
-        "./repositories/*.js",
-        "./repositories/*.ts"
+        "./src/repositories/*.js",
+        "./src/repositories/*.ts"
       ],
       "#services/*": [
-        "./services/*.js",
-        "./services/*.ts"
+        "./src/services/*.js",
+        "./src/services/*.ts"
       ],
-      "#NotFoundError": ["./Error/NotFoundError.js"],
-      "#DuplicateError": ["./Error/DuplicateError.js"],
-      "#MissingValuesError": ["./Error/MissingValuesError.js"],
-      "#config": ["./config.js"],
-      "#database": ["./lib/functions/database/db.js"],
-      "#crypto": ["./util/security/"]
+      "#NotFoundError": ["./src/Error/NotFoundError.js"],
+      "#DuplicateError": ["./src/Error/DuplicateError.js"],
+      "#MissingValuesError": ["./src/Error/MissingValuesError.js"],
+      "#config": ["./src/config.js"],
+      "#database": ["./src/lib/functions/database/db.js"],
+      "#crypto": ["./src/util/security/"]
     }
   },
   "include": [

@@ -5,6 +5,8 @@
     "module": "es2020",
     "declaration": false,
     "esModuleInterop": true,
+    "strictPropertyInitialization": false,
+    "skipLibCheck": true,
     "sourceMap": true,
     "paths": {
       "#User": ["./src/models/User.js"],

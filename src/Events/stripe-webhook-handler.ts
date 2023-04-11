@@ -47,7 +47,7 @@ export async function handleWebhook(request, response) {
             const serverFiltered = servers.filter(server => server.id === parseInt(JSON.parse(subscription.metadata.servers)));
 
             for (const server of serverFiltered) {
-                const serFu = await pteroClient.getServer(String(server.id))
+                const serFu:Pterodactyl.Server = await pteroClient.getServer(String(server.id))
 
                 const productId = subscription.items.data[0].price.product;
 

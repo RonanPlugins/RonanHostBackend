@@ -1,45 +1,22 @@
-type UUID = string & { readonly __brand: unique symbol };
-export default class Page {
-    private _id: UUID;
-    private _name: string;
-    private _content: string;
+import {UUID} from "../util/functions/UUID.js";
+import {AutoAccessor} from "../util/decorators/AutoAccessor.js";
+import BaseModel, {RequiredFields} from "./Base/BaseModel.js";
 
-    get id(): UUID {
-        return this._id;
-    }
+export interface PageRequiredFields extends RequiredFields {
+    name: string;
+    content: string;
+}
+export default class Page extends BaseModel<PageRequiredFields> {
+    required: PageRequiredFields;
 
-    set id(value: UUID) {
-        this._id = value;
-    }
-
-    get name(): string {
-        return this._name;
-    }
-
-    set name(value: string) {
-        this._name = value;
-    }
-
-    get content(): string {
-        return this._content;
-    }
-
-    set content(value: string) {
-        this._content = value;
-    }
-
+    @AutoAccessor()
+    public name: string;
+    @AutoAccessor()
+    public content: string
 
     constructor(id: UUID, name: string, content: string) {
-        this._id = id;
-        this._name = name;
-        this._content = content;
-    }
-
-    toJSON() {
-        return {
-            id: this.id,
-            name: this.name,
-            content: this.content
-        }
+        super(id)
+        this.name = name;
+        this.content = content;
     }
 }

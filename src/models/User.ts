@@ -4,6 +4,7 @@ import dotenv from "dotenv"
 import BaseModel, {RequiredFields} from "./Base/BaseModel.js";
 import {AutoAccessor, AutoAccessors} from "../util/decorators/AutoAccessor.js";
 import type { Hashed } from '../@types/crypto';
+import {Permissions} from "../enum/Permissions.js";
 dotenv.config()
 
 
@@ -34,13 +35,18 @@ export default class User extends BaseModel<UserRequiredFields> {
     @AutoAccessor()
     public password: Hashed<string>|String;
 
-    constructor(id: UUID, email: string, name: string, pterodactyl_user_id: number, stripe_customer_id: string, password: Hashed<string>|string) {
+    @AutoAccessor()
+    public permissions: number;
+
+    constructor(id: UUID, email: string, name: string, pterodactyl_user_id: number, stripe_customer_id: string,
+                password: Hashed<string>|string, permissions: number) {
         super(id)
         this.email = email;
         this.name = name;
         this.pterodactyl_user_id = pterodactyl_user_id;
         this.stripe_customer_id = stripe_customer_id;
         this.password = password;
+        this.permissions = permissions;
     }
 
     protected async loadPterodactylUser(): Promise<void> {

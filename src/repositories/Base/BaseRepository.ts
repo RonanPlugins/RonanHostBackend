@@ -19,10 +19,10 @@ export default class BaseRepository<T extends {required: Record<string, any>}> {
         const keys = Object.keys(data).join(', ');
         const values = Object.values(data);
         const placeholders = values.map(_ => '?').join(', ');
-        await query(`INSERT INTO ${this.tableName()} (id, ${keys}) VALUES (?, ${placeholders})`, [data.id, ...values]).catch(e => {
-            if (e.errno === 1062) throw new DuplicateError(this.tableName(), data, e);
+        await query(`INSERT INTO ${this.tableName()} (${keys}) VALUES (${placeholders})`, [...values]).catch(e => {
+            if (e.errno === 1062) throw new DuplicateError(this.tableName(), data, e); else throw e
         });
-        return this.createInstance((await query(`SELECT * FROM ${this.tableName()} WHERE id = ?`, [data.id]))[0]);
+        return this.createInstance((await query(`SELECT * FROM ${this.tableName()} WHERE id = ?`, [data.id]))[0])
     }
     async update(id: string, data: Partial<T>): Promise<T> {
         const keys = Object.keys(data).map(key => `${key} = ?`).join(', ');

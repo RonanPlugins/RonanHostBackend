@@ -27,6 +27,7 @@ export default class UserRepository extends BaseRepository<User> {
     }
 
     async create(data: User["required"]): Promise<User> {
+        console.log(data)
         const firstName = data.name.split(' ')[0]
         const lastName = data.name.split(' ')[1]
 
@@ -35,7 +36,7 @@ export default class UserRepository extends BaseRepository<User> {
         }).catch(err => {throw err})
         const res:User = await this.insert(data)
         const stripeUser = await stripeApi.createCustomer(
-            new User(res.id, data.email, firstName+lastName, pteroUser.id, String(pteroUser.id), undefined))
+            new User(res.id, data.email, firstName+lastName, pteroUser.id, String(pteroUser.id), undefined, undefined))
         return await this.update(res.id, {stripe_customer_id: stripeUser.id, pterodactyl_user_id: pteroUser.id})
     }
     tableName()  {

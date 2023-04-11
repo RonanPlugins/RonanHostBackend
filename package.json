@@ -6,7 +6,7 @@
     "dist"
   ],
   "scripts": {
-    "start": "node -r tsconfig-paths/register dist/src/app.js",
+    "start": "npm run build && node -r tsconfig-paths/register dist/src/app.js",
     "build": "tsc --build tsconfig.json",
     "dev": "node -r tsconfig-paths/register dist/src/app.js"
   },

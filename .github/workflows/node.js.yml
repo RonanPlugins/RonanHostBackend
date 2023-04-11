@@ -21,6 +21,7 @@ jobs:
         password: ${{secrets.VPS_PASSWORD}}
         script: |
           cd /var/www/RonanHost/backend
+          git reset --hard
           git pull
           npm install
           systemctl restart RonanHostApi.service

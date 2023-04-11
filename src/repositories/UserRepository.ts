@@ -35,7 +35,7 @@ export default class UserRepository extends BaseRepository<User> {
         }).catch(err => {throw err})
         const res:User = await this.insert(data)
         const stripeUser = await stripeApi.createCustomer(
-            new User(res.id, data.email, firstName+lastName, pteroUser.id, String(pteroUser.id)))
+            new User(res.id, data.email, firstName+lastName, pteroUser.id, String(pteroUser.id), undefined))
         return await this.update(res.id, {stripe_customer_id: stripeUser.id, pterodactyl_user_id: pteroUser.id})
     }
     tableName()  {

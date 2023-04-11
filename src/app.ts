@@ -36,7 +36,7 @@ app.use( session({
 app.set("trust proxy", true);
 app.use((req, res, next) => {
     const origin = req.headers.origin;
-    if (config().allowedOrigins.includes(origin)) {
+    if (config.allowedOrigins.includes(origin)) {
         res.setHeader('Access-Control-Allow-Origin', origin);
     }
     //res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:8020');
@@ -53,7 +53,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 import ServerController from './controllers/ServerController.js';
+import userController from "./controllers/UserController.js";
 app.use('/server', ServerController);
+app.use('/user', userController)
 
 
 app.get("/", (req, res) => {

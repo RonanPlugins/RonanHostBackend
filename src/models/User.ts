@@ -3,6 +3,7 @@ import Pterodactyl from "@avionrx/pterodactyl-js";
 import dotenv from "dotenv"
 import BaseModel, {RequiredFields} from "./Base/BaseModel.js";
 import {AutoAccessor, AutoAccessors} from "../util/decorators/AutoAccessor.js";
+import type { Hashed } from '../@types/crypto';
 dotenv.config()
 
 
@@ -30,12 +31,16 @@ export default class User extends BaseModel<UserRequiredFields> {
     public stripe_customer_id: string;
     private _stripe_customer: any;
 
-    constructor(id: UUID, email: string, name: string, pterodactyl_user_id: number, stripe_customer_id: string) {
+    @AutoAccessor()
+    public password: Hashed<string>|String;
+
+    constructor(id: UUID, email: string, name: string, pterodactyl_user_id: number, stripe_customer_id: string, password: Hashed<string>|string) {
         super(id)
         this.email = email;
         this.name = name;
         this.pterodactyl_user_id = pterodactyl_user_id;
         this.stripe_customer_id = stripe_customer_id;
+        this.password = password;
     }
 
     protected async loadPterodactylUser(): Promise<void> {
@@ -43,10 +48,7 @@ export default class User extends BaseModel<UserRequiredFields> {
     }
 
     protected get pterodactyl_user(): any {
-
-        if (!this._pterodactyl_user) {
-            return this.loadPterodactylUser();
-        }
+        if (!this._pterodactyl_user) return this.loadPterodactylUser();
         return this._pterodactyl_user;
     }
     async loadStripeCustomer(): Promise<void> {

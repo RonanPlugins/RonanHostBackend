@@ -30,7 +30,7 @@ function checkLoggedIn(req, res, next) {
 //////////////////////////////////////////
 // Protected from non-logged-in users. //
 ////////////////////////////////////////
-router.post('/create', checkLoggedIn, async function (req, res, next) {
+router.post('/create', checkLoggedIn, async function (req:any, res:any, next:any) {
     const session_user_id = req?.user?.id;
     console.log("Create server")
 
@@ -98,7 +98,7 @@ interface update {
 // Pass updates as JSON.stringify()
 // Example for updates
 //
-router.post('/update', checkLoggedIn, async function (req, res, next) {
+router.post('/update', checkLoggedIn, async function (req:any, res:any, next:any) {
     const session_user_id = req?.user?.id;
     console.log("Create server")
 

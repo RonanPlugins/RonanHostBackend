@@ -1,7 +1,10 @@
 import express from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv"
-dotenv.config()
+dotenv.config();
+import { strategy } from './Strategies/local.js'
+
+import passport from "passport";
 
 import {AppConfig, config as configLoader} from "../config.js";
 const config:AppConfig = configLoader ?? (() =>
@@ -34,7 +37,7 @@ app.use( session({
     }));
 
 app.set("trust proxy", true);
-app.use((req, res, next) => {
+app.use((req:any, res:any, next:any) => {
     const origin = req.headers.origin;
     if (config.allowedOrigins.includes(origin)) {
         res.setHeader('Access-Control-Allow-Origin', origin);
@@ -52,16 +55,20 @@ app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(strategy);
+
 import ServerController from './controllers/ServerController.js';
 import userController from "./controllers/UserController.js";
 app.use('/server', ServerController);
 app.use('/user', userController)
 
 
-app.get("/", (req, res) => {
+app.get("/", (req:any, res:any) => {
     res.send("Hello, world!");
 });
 
 app.listen(config.app_port, async () => {
-    console.log("Server listening on port 3006");
+    console.log("Server listening on port "+config.app_port);
 });

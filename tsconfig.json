@@ -3,6 +3,7 @@
     "experimentalDecorators": true,
     "target": "es2020",
     "moduleResolution": "node",
+    "watch": true,
     "module": "es2020",
     "declaration": false,
     "esModuleInterop": true,

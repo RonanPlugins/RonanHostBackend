@@ -63,7 +63,8 @@ export async function handleWebhook(request, response) {
                 };
                 await serFu.setAllocationAmount(featureLimits.allocations);
                 await serFu.setDatabaseAmount(featureLimits.databases);
-                await serFu.setBackupsAmount(featureLimits.backups);
+                // TODO Avion Fix
+                // await serFu.setBackupsAmount(featureLimits.backups);
 
                 const updatedLimits: ServerLimits = {
                     cpu: plan.cpu,

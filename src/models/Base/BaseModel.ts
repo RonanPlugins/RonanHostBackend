@@ -1,5 +1,5 @@
-import {UUID} from "../../types/UUID";
-import {AutoAccessor, AutoAccessors} from "#decorators/AutoAccessor";
+import {UUID} from "../../util/functions/UUID.js";
+import {AutoAccessor, AutoAccessors} from "../../util/decorators/AutoAccessor.js";
 
 export interface RequiredFields {
     id: UUID;

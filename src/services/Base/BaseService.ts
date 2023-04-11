@@ -1,27 +1,36 @@
-import {UUID} from "#UUID";
-export default abstract class BaseService<T> {
-    protected repository: any
+import {UUID} from "../../util/functions/UUID.js";
+import UserRepository from "../../repositories/UserRepository.js";
+import BaseRepository from "../../repositories/Base/BaseRepository.js";
+import NotFoundError from "../../Error/NotFoundError.js";
 
-    protected constructor(repository: any) {
+export default class BaseService<
+    T extends BaseRepository<K>,
+    K extends { required: Record<string, any> }> {
+    protected repository: T;
+
+    constructor(repository: T) {
         this.repository = repository;
     }
 
-    async create(entity: any): Promise<any> {
+    async insert(entity: K["required"]): Promise<any> {
         return await this.repository.insert(entity);
     }
 
-    async getById(id: UUID): Promise<any | undefined> {
-        return await this.repository.findOne(id);
+    async fetchOne(q:any): Promise<K | NotFoundError> {
+        return await this.repository.fetchOne(q).catch(e => {throw e});
+    }
+    async fetchAll(...q:any[]): Promise<K[] | NotFoundError> {
+        return await this.repository.fetchAll(...q);
     }
 
-    async update(id: UUID, entity: Partial<any>): Promise<any> {
-        const current = await this.repository.findOne(id);
+    public async update(id: UUID, entity: Partial<K>): Promise<K> {
+        const current = await this.repository.fetchOne(id);
         if (!current) throw new Error(`Entity with id ${id} not found`);
         const updated = Object.assign(current, entity);
-        return await this.repository.update(updated);
+        return await this.repository.update(id, updated);
     }
 
-    async delete(id: string): Promise<void> {
+    async delete(id: UUID): Promise<void> {
         await this.repository.delete(id);
     }
 }

@@ -29,7 +29,7 @@ export async function handleWebhook(request, response) {
             const customer = await stripe.customers.retrieve(customerId);
             // Get the customer's information from your database using their Stripe customer ID
             const stripeCustomer = await stripeApi.getCustomer(customer.id);
-            const customerObj = await customerApi.getCustomerByStripeId(customer.id);
+            const customerObj = await customerApi.fetchOne(customer.id).catch(e => { return e; });
             const pteroUser = await pteroClient.getUser(String(customerObj.pterodactyl_user_id));
             const servers = (await pteroClient.getServers()).filter(server => server.user === pteroUser.id);
             console.log(subscription.metadata.servers);
@@ -70,7 +70,7 @@ export async function handleWebhook(request, response) {
             const customer = await stripe.customers.retrieve(customerId);
             // Get the customer's information from your database using their Stripe customer ID
             const stripeCustomer = await stripeApi.getCustomer(customer.id);
-            const customerObj = await customerApi.getCustomerByStripeId(customer.id);
+            const customerObj = await customerApi.fetchOne(customer.id);
             const pteroUser = await pteroClient.getUser(String(customerObj.pterodactyl_user_id));
             const servers = (await pteroClient.getServers()).filter(server => server.user === pteroUser.id);
             const serverFiltered = servers.filter(server => JSON.parse(subscription.metadata.servers).includes(server.id));
@@ -91,7 +91,7 @@ export async function handleWebhook(request, response) {
                 const customer = await stripe.customers.retrieve(customerId);
                 // Get customer information from a database using Stripe customer ID
                 const stripeCustomer = await stripeApi.getCustomer(customer.id);
-                const customerObj = await customerApi.getCustomerByStripeId(customer.id);
+                const customerObj = await customerApi.fetchOne(customer.id);
                 const pteroUser = await pteroClient.getUser(String(customerObj.pterodactyl_user_id));
                 // Loop through subscription items and create a server for each
                 for (const item of subscription.items.data) {
@@ -170,7 +170,7 @@ export async function handleWebhook(request, response) {
             const customerId = subscription.customer;
             const customer = await stripe.customers.retrieve(customerId);
             const stripeCustomer = await stripeApi.getCustomer(customer.id);
-            let customerA = await customerApi.getCustomerByStripeId(stripeCustomer.id).catch(err => { return null; });
+            let customerA = await customerApi.fetchOne(stripeCustomer.id).catch(err => { return null; });
             if (!customerA) {
                 // @ts-ignore
                 customerA = await customerApi.createFromStripe(customer).catch(err => { return null; });

@@ -1,12 +1,13 @@
-import BaseService from "#baseService";
-import {User} from "#models/User";
-import UserRepository from "#repositories/UserRepository";
-import {UUID} from "#UUID";
+import BaseService from "../services/Base/BaseService.js";
+import UserRepository from "../repositories/UserRepository.js";
+import User from "../models/User.js";
 
-export default class UserService extends BaseService<User, UserRepository> {
-    private repository: UserRepository;
+export default class UserService extends BaseService<UserRepository, User> {
     constructor(repository: UserRepository) {
         super(repository);
-        this.repository = repository;
+    }
+
+    async create(data:User["required"]):Promise<User> {
+        return await this.repository.create(data).catch(e => {throw e})
     }
 }

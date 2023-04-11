@@ -37,7 +37,7 @@ router.post('/create', checkLoggedIn, async function (req, res, next) {
     const featureLimits = {
         allocations: 0, databases: databases, backups: backups
     };
-    const customerObj = await userApi.getById(req?.user?.id);
+    const customerObj = await userApi.fetchOne(req?.user?.id).catch(e => { return req.status(500).send({ err: e }); });
     const stripeCus = await stripe.customers.retrieve(customerObj.stripe_customer_id);
     const subscriptions = await stripe.subscriptions.list({
         customer: stripeCus.id,

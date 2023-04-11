@@ -1,6 +1,6 @@
-import { query } from '#data/database';
-import NotFoundError from "#errors/NotFoundError";
-import DuplicateError from "#errors/DuplicateError";
+import { query } from '../../util/data/database.js';
+import NotFoundError from "../../Error/NotFoundError.js";
+import DuplicateError from "../../Error/DuplicateError.js";
 export default class BaseRepository {
     constructor(createInstance) {
         this.createInstance = createInstance;

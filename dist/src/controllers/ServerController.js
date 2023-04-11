@@ -1,82 +1,67 @@
 import express from "express";
 import { query } from "../util/data/database.js";
-import Pterodactyl from "@avionrx/pterodactyl-js";
-import randomResponse from "../util/message/checkLoggedInFailedResponse.js"
-import StripeApiClient, { Customer } from "../util/external/clients/stripe-api-client";
+import randomResponse from "../util/message/checkLoggedInFailedResponse.js";
 import UserRepository from "../repositories/UserRepository.js";
 import Stripe from "stripe";
 import MissingValuesError from "../Error/MissingValuesError.js";
-import {findAvailableNode} from "../util/nodes/NodeAllocator.js";
+import { findAvailableNode } from "../util/nodes/NodeAllocator.js";
 import Server from "../models/Server.js";
-
 // const pteroClient = new Pterodactyl.Builder()
 //     .setURL(process.env.PTERODACTYL_BASE_URL)
 //     .setAPIKey(process.env.PTERODACTYL_API_KEY)
 //     .asAdmin();
-
-import pteroClient from "../util/external/builds/PterodactylClient.js"
-import User from "../models/User.js";
-
-const stripe =new Stripe(process.env.STRIPE_API_KEY, {apiVersion: "2022-11-15"})
+import pteroClient from "../util/external/builds/PterodactylClient.js";
+const stripe = new Stripe(process.env.STRIPE_API_KEY, { apiVersion: "2022-11-15" });
 const router = express.Router();
-
 export default router;
-const userApi = new UserRepository()
-
+const userApi = new UserRepository();
 function checkLoggedIn(req, res, next) {
-    if (req?.user) next(); else return res.status(403).json({ error: true, message: randomResponse().message});
+    if (req?.user)
+        next();
+    else
+        return res.status(403).json({ error: true, message: randomResponse().message });
 }
-
 //////////////////////////////////////////
 // Protected from non-logged-in users. //
 ////////////////////////////////////////
 router.post('/create', checkLoggedIn, async function (req, res, next) {
     const session_user_id = req?.user?.id;
-    console.log("Create server")
-
+    console.log("Create server");
     const { name, ram, version, disk, cpu, allocations = 0, backups, databases } = req.body || null;
-
     //NEW
-    const missingValues:string[] = ['name', 'ram', 'version', 'disk', 'cpu', 'backups', 'databases'].filter(key => !req.body[key]);
+    const missingValues = ['name', 'ram', 'version', 'disk', 'cpu', 'backups', 'databases'].filter(key => !req.body[key]);
     if (missingValues.length > 0) {
         const MVE = new MissingValuesError(missingValues);
-        res.status(MVE.statusCode).body({error: MVE})
+        res.status(MVE.statusCode).body({ error: MVE });
     }
-
-    const featureLimits: Pterodactyl.ServerFeatureLimits = {
+    const featureLimits = {
         allocations: 0, databases: databases, backups: backups
-    }
-
-    const customerObj = <User>await userApi.fetchOne(req?.user?.id).catch(e => {return req.status(500).send({err: e})});
-    const stripeCus = await stripe.customers.retrieve(customerObj.stripe_customer_id)
-
-
+    };
+    const customerObj = await userApi.fetchOne(req?.user?.id).catch(e => { return req.status(500).send({ err: e }); });
+    const stripeCus = await stripe.customers.retrieve(customerObj.stripe_customer_id);
     const subscriptions = await stripe.subscriptions.list({
         customer: stripeCus.id,
     });
-    const plan = (await query("SELECT * FROM plan WHERE stripe_product_id = ?", [subscriptions.data[0].items.data[0].id]))[0]
-
-    const node: Pterodactyl.Node = await pteroClient.getNode(String((await findAvailableNode(pteroClient, plan.memory))[0]))
+    const plan = (await query("SELECT * FROM plan WHERE stripe_product_id = ?", [subscriptions.data[0].items.data[0].id]))[0];
+    const node = await pteroClient.getNode(String((await findAvailableNode(pteroClient, plan.memory))[0]))
         .catch(e => {
-            return undefined;
-        })
+        return undefined;
+    });
     const availableAllocations = (await node.getAllocations())
         .filter(allocation => allocation.assigned === false)
         .slice(0, plan.allocations + 1);
-
     const defaultAllocation = availableAllocations[0];
     const additionalAllocations = availableAllocations.slice(1, allocations)
         .map(allocation => allocation.id);
-
     const newServer = await pteroClient.createServer({
         allocation: { additional: [], default: defaultAllocation.id },
         deploy: { dedicatedIp: false, portRange: ["25565", "25566"], locations: [1] },
         description: "My new Minecraft server",
         egg: 5,
-        environment: { "SERVER_JARFILE": "server.jar", "BUILD_NUMBER": version},
+        environment: { "SERVER_JARFILE": "server.jar", "BUILD_NUMBER": version },
         featureLimits: featureLimits,
         image: "quay.io/pterodactyl/core:java",
-        limits: { memory: ram, swap: plan.swap, disk: disk, io: plan.io, cpu: cpu},
+        limits: { memory: ram, swap: plan.swap, disk: disk, io: plan.io, cpu: cpu },
         name: name,
         outOfMemoryKiller: false,
         skipScripts: false,
@@ -84,35 +69,26 @@ router.post('/create', checkLoggedIn, async function (req, res, next) {
         startup: "java -Xmx{{SERVER_MEMORY}} -Xms{{SERVER_MEMORY}} -jar {{SERVER_JARFILE}} nogui",
         user: 1
     }).catch((error) => {
-        res.send(error)
-        console.log(error)
-    })
+        res.send(error);
+        console.log(error);
+    });
     // @ts-ignore
-    res.send({success: true, server: new Server(...Object.values(newServer))});
-})
-
-interface update {
-    [key: string]: string;
-}
-
+    res.send({ success: true, server: new Server(...Object.values(newServer)) });
+});
 // Pass updates as JSON.stringify()
 // Example for updates
 //
 router.post('/update', checkLoggedIn, async function (req, res, next) {
     const session_user_id = req?.user?.id;
-    console.log("Create server")
-
-    const missingValues:string[] = ['updates', 'server'].filter(key => !req.body[key]);
+    console.log("Create server");
+    const missingValues = ['updates', 'server'].filter(key => !req.body[key]);
     if (missingValues.length > 0) {
         const MVE = new MissingValuesError(missingValues);
-        res.status(MVE.statusCode).body({error: MVE})
+        res.status(MVE.statusCode).body({ error: MVE });
     }
-
     const server = req.body.server;
-    const updatesArray: update[] = JSON.parse(req.body.updates);
-
+    const updatesArray = JSON.parse(req.body.updates);
     const serFu = await pteroClient.getServer(String(server));
-
     for (const update of updatesArray) {
         for (const key in update) {
             switch (key) {
@@ -132,6 +108,5 @@ router.post('/update', checkLoggedIn, async function (req, res, next) {
             }
         }
     }
-    res.status(200).json({success: true})
-
-})
+    res.status(200).json({ success: true });
+});

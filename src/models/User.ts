@@ -1,8 +1,8 @@
-import {UUID} from "../types/UUID";
+import {UUID} from "../util/functions/UUID.js";
 import Pterodactyl from "@avionrx/pterodactyl-js";
 import dotenv from "dotenv"
 import BaseModel, {RequiredFields} from "./Base/BaseModel.js";
-import {AutoAccessor, AutoAccessors} from "#decorators/AutoAccessor";
+import {AutoAccessor, AutoAccessors} from "../util/decorators/AutoAccessor.js";
 dotenv.config()
 
 
@@ -11,12 +11,12 @@ const pteroClient = new Pterodactyl.Builder()
     .setAPIKey(process.env.PTERODACTYL_API_KEY)
     .asAdmin();
 
-export interface UserRequiredFields extends RequiredFields{
+export interface UserRequiredFields extends RequiredFields {
     email: string,
     name: string,
     password: string
 }
-export class User extends BaseModel<UserRequiredFields> {
+export default class User extends BaseModel<UserRequiredFields> {
     required: UserRequiredFields
 
     @AutoAccessor()

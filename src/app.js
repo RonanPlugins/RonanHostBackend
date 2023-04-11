@@ -2,11 +2,11 @@ import express from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 dotenv.config();
-import { config as configLoader } from "./config.js";
+import { config as configLoader } from "../config";
 const config = configLoader ?? (() => { console.error("You are missing the config.yml file!\nExiting..."); process.exit(1); return undefined; })();
 import session from "express-session";
 import mysqlSession from "express-mysql-session";
-import { handleWebhook } from "./src/Events/stripe-webhook-handler.js";
+import { handleWebhook } from "./Events/stripe-webhook-handler";
 const app = express();
 const options = {
     host: process.env.MYSQL_HOST,
@@ -40,7 +40,7 @@ app.post('/webhooks/stripe', bodyParser.raw({ type: 'application/json' }), handl
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-import ServerController from './src/controllers/ServerController.js';
+import ServerController from './controllers/ServerController';
 app.use('/server', ServerController);
 app.get("/", (req, res) => {
     res.send("Hello, world!");

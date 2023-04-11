@@ -3,13 +3,13 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv"
 dotenv.config()
 
-import {AppConfig, config as configLoader} from "./config.js";
+import {AppConfig, config as configLoader} from "../config.js";
 const config:AppConfig = configLoader ?? (() =>
 { console.error("You are missing the config.yml file!\nExiting..."); process.exit(1); return undefined; })();
 
 import session from "express-session";
 import mysqlSession from "express-mysql-session";
-import {handleWebhook} from "./src/Events/stripe-webhook-handler.js";
+import {handleWebhook} from "./Events/stripe-webhook-handler.js";
 
 const app = express();
 
@@ -52,7 +52,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-import ServerController from './src/controllers/ServerController.js';
+import ServerController from './controllers/ServerController.js';
 app.use('/server', ServerController);
 
 

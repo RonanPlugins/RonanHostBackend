@@ -1,10 +1,10 @@
 import BaseRepository from "./Base/BaseRepository.js"
-import StripeApiClient from "#stripe-api-client";
-import NotFoundError from "#errors/NotFoundError";
+import StripeApiClient from "../util/external/clients/stripe-api-client.js";
+import NotFoundError from "../Error/NotFoundError.js";
 import Pterodactyl from "@avionrx/pterodactyl-js";
 import dotenv from "dotenv"
-import {User} from "../models/User.js";
-import crypto from "#crypto"
+import User from "../models/User.js";
+import crypto from "../util/security/crypto.js"
 
 dotenv.config()
 

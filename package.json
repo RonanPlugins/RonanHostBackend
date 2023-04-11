@@ -1,14 +1,14 @@
 {
   "name": "RonanHost-Backend",
-  "version": "1.2.5",
+  "version": "1.3.0",
   "type": "module",
   "files": [
     "dist"
   ],
   "scripts": {
-    "start": "node app.js",
+    "start": "node -r tsconfig-paths/register dist/src/app.js",
     "build": "tsc --build tsconfig.json",
-    "dev": "node app.js"
+    "dev": "node -r tsconfig-paths/register dist/src/app.js"
   },
   "dependencies": {
     "@avionrx/pterodactyl-js": "^2.1.2",
@@ -26,60 +26,67 @@
     "powerbi-client": "^2.22.2",
     "pterodactyl.js": "^2.1.1",
     "stripe": "^12.0.0",
+    "tsconfig-paths": "^4.2.0",
     "typeorm": "^0.3.14",
     "uuid": "^9.0.0"
   },
   "imports": {
     "#User": [
-      "./src/models/User.js"
-    ],
-    "#repositories/*": [
-      "./src/repositories/*.js"
-    ],
-    "#decorators/*": [
-      "./src/util/decorators/*.js"
-    ],
-    "#services/*": [
-      "./src/services/*.js"
-    ],
-    "#models/*": [
-      "./src/models/*.js"
-    ],
-    "#data/*": [
-      "./src/util/data/*.js"
-    ],
-    "#errors/*": [
-      "./src/Error/*.js"
-    ],
-    "#NotFoundError": [
-      "./src/Error/NotFoundError.js"
-    ],
-    "#DuplicateError": [
-      "./src/Error/DuplicateError.js"
-    ],
-    "#MissingValuesError": [
-      "./src/Error/MissingValuesError.js"
-    ],
-    "#config": [
-      "./src/config.js"
-    ],
-    "#database": [
-      "./src/util/data/database.js"
-    ],
-    "#crypto": [
-      "./src/util/security/crypto.js"
+      "./models/User"
     ],
     "#UUID": [
-      "./src/types/UUID.js"
+      "./util/functions/uuid"
     ],
-    "#stripe-api-client": [
-      "./src/util/external/clients/stripe-api-client.js"
+    "#repositories/*": [
+      "./repositories/*"
+    ],
+    "#functions/*": [
+      "./util/functions/*"
+    ],
+    "#util/*": [
+      "./util/*"
+    ],
+    "#models/*": [
+      "./models/*"
     ],
     "#baseRepository": [
-      "./src/repositories/Base/BaseRepository.js"
+      "./repositories/Base/BaseRepository"
     ],
     "#baseService": [
-      "./src/services/Base/BaseService.js"
+      "./services/Base/BaseService"
+    ],
+    "#services/*": [
+      "./services/*"
+    ],
+    "#data/*": [
+      "./util/data/*"
+    ],
+    "#decorators/*": [
+      "./util/decorators/*"
+    ],
+    "#errors/*": [
+      "./Error/*"
+    ],
+    "#NotFoundError": [
+      "./Error/NotFoundError"
+    ],
+    "#DuplicateError": [
+      "./Error/DuplicateError"
+    ],
+    "#MissingValuesError": [
+      "./Error/MissingValuesError"
+    ],
+    "#config": [
+      "./config"
+    ],
+    "#database": [
+      "./util/data/database"
+    ],
+    "#crypto": [
+      "./util/security/crypto"
+    ],
+    "#stripe-api-client": [
+      "./util/external/clients/stripe-api-client"
     ]
   },
   "devDependencies": {

@@ -1,7 +1,7 @@
-import { query } from '#data/database';
-import NotFoundError from "#errors/NotFoundError";
-import DuplicateError from "#errors/DuplicateError";
-import {newUUID} from "#UUID";
+import { query } from '../../util/data/database.js';
+import NotFoundError from "../../Error/NotFoundError.js";
+import DuplicateError from "../../Error/DuplicateError.js";
+import {UUID} from "../../util/functions/UUID.js";
 
 export default class BaseRepository<T extends {required: Record<string, any>}> {
     constructor(private createInstance: (row: any) => T) {}
@@ -11,19 +11,18 @@ export default class BaseRepository<T extends {required: Record<string, any>}> {
         return rows.map(row => this.createInstance(row));
     }
 
-    async fetchOne(...q):Promise<T|NotFoundError> {
+    async fetchOne(...q):Promise<T> {
         const rows = await query(`SELECT * FROM ${this.tableName()} ${this.buildWhereClause(q)} LIMIT 1`, this.buildValues(q)).catch(e => {console.error(e)});
         if (rows && rows.length) return rows.length ? this.createInstance(rows[0]) : undefined; else throw new NotFoundError(this.tableName(), q);
     }
     async insert(data: T['required']): Promise<T> {
-        const uuid = newUUID();
         const keys = Object.keys(data).join(', ');
         const values = Object.values(data);
         const placeholders = values.map(_ => '?').join(', ');
-        await query(`INSERT INTO ${this.tableName()} (id, ${keys}) VALUES (?, ${placeholders})`, [uuid, ...values]).catch(e => {
+        await query(`INSERT INTO ${this.tableName()} (id, ${keys}) VALUES (?, ${placeholders})`, [data.id, ...values]).catch(e => {
             if (e.errno === 1062) throw new DuplicateError(this.tableName(), data, e);
         });
-        return this.createInstance((await query(`SELECT * FROM ${this.tableName()} WHERE id = ?`, [uuid]))[0]);
+        return this.createInstance((await query(`SELECT * FROM ${this.tableName()} WHERE id = ?`, [data.id]))[0]);
     }
     async update(id: string, data: Partial<T>): Promise<T> {
         const keys = Object.keys(data).map(key => `${key} = ?`).join(', ');
@@ -34,7 +33,7 @@ export default class BaseRepository<T extends {required: Record<string, any>}> {
         const result = await query(`SELECT * FROM ${this.tableName()} WHERE id = ?`, [id]);
         if (result && result.length) return this.createInstance(result[0]); else throw new NotFoundError(this.tableName(), id);
     }
-    async delete(id: string): Promise<void> {
+    async delete(id: UUID): Promise<void> {
         const result = await query(`DELETE FROM ${this.tableName()} WHERE id = ?`, [id]);
         if (result.affectedRows === 0) {
             throw new NotFoundError(this.tableName(), id);

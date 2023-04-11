@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 import Pterodactyl from "@avionrx/pterodactyl-js";
 import dotenv from "dotenv";
 import BaseModel from "./Base/BaseModel.js";
-import { AutoAccessor } from "#decorators/AutoAccessor";
+import { AutoAccessor } from "../util/decorators/AutoAccessor.js";
 dotenv.config();
 const pteroClient = new Pterodactyl.Builder()
     .setURL(process.env.PTERODACTYL_BASE_URL)

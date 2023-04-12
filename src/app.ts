@@ -87,7 +87,3 @@ process.on('SIGINT', function() {
   // some other closing procedures go here
   process.exit(0);
 });
-
-
-// @ts-ignore
-console.log(crypto.hash("EE8^Z2xtJ!#2%e!!"))

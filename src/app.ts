@@ -72,3 +72,9 @@ app.get("/", (req:any, res:any) => {
 app.listen(config.app_port, async () => {
     console.log("Server listening on port "+config.app_port);
 });
+
+process.on('SIGINT', function() {
+  console.log( "\nGracefully shutting down from SIGINT (Ctrl-C)" );
+  // some other closing procedures go here
+  process.exit(0);
+});

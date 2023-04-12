@@ -47,3 +47,12 @@ router.get('/:page', async (req, res) => {
         return res.status(400).send(error);
     }
 });
+router.get('/', async (req:any, res:any) => {
+    try {
+        const Pages = await pageService.fetchAll().catch(e => { throw e })
+        console.log(Pages)
+        return res.status(200).json(Pages);
+    } catch (error) {
+        return res.status(400).send(error);
+    }
+});

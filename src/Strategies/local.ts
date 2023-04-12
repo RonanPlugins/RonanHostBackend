@@ -16,7 +16,7 @@ passport.serializeUser(function (user: any, cb: any) {
 passport.deserializeUser(async function (user: any, cb: any) {
     process.nextTick(async function () {
         if (!user) return cb("Unauthorized: localStat")
-        const u = await userService.fetchOne(user.id).catch(error => {
+        const u = await userService.fetchOne(user.email).catch(error => {
             return cb('Invalid username/email or password', null);
         });
         return cb(null, u);
@@ -40,6 +40,6 @@ export const strategy = new Strategy(
         if (!passwordMatch) return done('Invalid username/email or password', null);
 
         //toJSON sanitises the user instance (remove sensitive info such as password and discord)
-        return done(null, user.toJSON());
+        return done(null, await user.toJSON());
     }
 );

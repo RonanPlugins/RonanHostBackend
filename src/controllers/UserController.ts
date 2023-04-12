@@ -6,7 +6,7 @@ import {v4} from "../util/functions/UUID.js";
 import UserRepository from "../repositories/UserRepository.js"
 import iUserService from "../services/UserService.js"
 import randomResponse from "../util/message/checkLoggedInFailedResponse.js";
-import User from "../models/User";
+import User from "../models/User.js";
 
 const userService: iUserService = new iUserService(new UserRepository())
 
@@ -24,7 +24,7 @@ router.get('/', async (req:any, res:any) => {
     }
     try {
         const user: User = await userService.fetchOne(query).catch(e => {return e});
-        return res.status(200).json({user: await user.toJSON(["password"])});
+        return res.status(200).json(await user.toJSON(["password"]))
     } catch (error) {
         console.error(error)
         return res.status(404).json({

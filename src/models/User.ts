@@ -2,11 +2,10 @@ import {UUID} from "../util/functions/UUID.js";
 import Pterodactyl from "@avionrx/pterodactyl-js";
 import dotenv from "dotenv"
 import BaseModel, {RequiredFields} from "./Base/BaseModel.js";
-import {AutoAccessor, AutoAccessors} from "../util/decorators/AutoAccessor.js";
-import type { Hashed } from '../@types/crypto';
-import {Permissions} from "../enum/Permissions.js";
-dotenv.config()
+import {AutoAccessor} from "../util/decorators/AutoAccessor.js";
+import type {Hashed} from '../@types/crypto';
 
+dotenv.config()
 
 const pteroClient = new Pterodactyl.Builder()
     .setURL(process.env.PTERODACTYL_BASE_URL)
@@ -50,18 +49,21 @@ export default class User extends BaseModel<UserRequiredFields> {
     }
 
     protected async loadPterodactylUser(): Promise<void> {
-        this._pterodactyl_user = await pteroClient.getUser(String(this.pterodactyl_user_id));
+        this._pterodactyl_user = await pteroClient.getUser(String(this.pterodactyl_user_id))
     }
 
-    protected get pterodactyl_user(): any {
+    @AutoAccessor()
+    public get pterodactyl_user(): Promise<any> {
         if (!this._pterodactyl_user) return this.loadPterodactylUser();
-        return this._pterodactyl_user;
+        return Promise.resolve(this._pterodactyl_user);
     }
+
     async loadStripeCustomer(): Promise<void> {
         // const response = await axios.get(`/api/customers/${this._stripe_customer_id}`);
         this._stripe_customer = null;
     }
 
+    @AutoAccessor()
     get stripe_customer(): any {
         if (!this._stripe_customer) {
             return this.loadStripeCustomer();

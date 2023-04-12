@@ -4,7 +4,9 @@ import DuplicateError from "../../Error/DuplicateError.js";
 import {UUID} from "../../util/functions/UUID.js";
 
 export default class BaseRepository<T extends {required: Record<string, any>}> {
-    constructor(private createInstance: (row: any) => T) {}
+    constructor(public createInstance: (row: any) => T) {}
+
+    protected stringFields: string[] = ['id']
 
     async fetchAll(...q):Promise<T[]> {
         const rows = await query(`SELECT * FROM ${this.tableName()} ${this.buildWhereClause(q)}`, this.buildValues(q));
@@ -43,14 +45,14 @@ export default class BaseRepository<T extends {required: Record<string, any>}> {
         return this.constructor.name.toLowerCase();
     }
 
-    private buildWhereClause(q) {
+    protected buildWhereClause(q) {
         if (q.length) {
             const conditions = [];
             for (const arg of q) {
                 if (typeof arg === 'number') {
                     conditions.push('id = ?');
                 } else if (typeof arg === 'string') {
-                    conditions.push('(name = ? OR email = ?)');
+                    this.stringFields.forEach(field => conditions.push(`${field} = ?`));
                 }
             }
             return 'WHERE ' + conditions.join(' OR ');
@@ -59,7 +61,7 @@ export default class BaseRepository<T extends {required: Record<string, any>}> {
         }
     }
 
-    private buildValues(q) {
-        return q.flatMap(x => typeof x === 'string' ? [x, x] : x);
+    protected buildValues(q) {
+        return q.flatMap(x => typeof x === 'string' ? this.stringFields.map(() => x) : x);
     }
 }

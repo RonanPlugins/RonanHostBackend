@@ -45,8 +45,4 @@ export default class BaseModel<T extends RequiredFields = RequiredFields> {
         // @ts-ignore
         return Object.fromEntries([...publicProperties, ...resolvedEntries]);
     }
-
-
-
-
 }

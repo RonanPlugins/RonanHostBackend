@@ -24,12 +24,20 @@ router.post('/create', checkLoggedIn, async (req, res) => {
     // @ts-ignore
     const session_user_id = req?.user?.id;
 
-    const user:User = <User> await userService.fetchOne(session_user_id).catch(e => {res.status(500).send(e)})
+    const user: User = <User>await userService.fetchOne(session_user_id).catch(e => {
+        res.status(500).send(e)
+    })
 
     if (getGrantedPermissions(user.permissions).includes(Permissions.PAGE_ADD)) {
-        await pageService.insert({
-            content: "", id: v4(), name: ""
+        const missingValues = ['content', 'name'].filter(key => !req.body[key]);
+        if (missingValues.length > 1) return res.status(new MissingValuesError(missingValues).statusCode).send({error: new MissingValuesError(missingValues)})
+        const ins = await pageService.insert({
+            content: req.body.content, id: v4(), name: req.body.name
+        }).catch(e => {
+            return res.status(500).send(e)
         })
+        console.log(ins)
+        res.status(200).send(await ins.toJSON())
     } else return res.status(500).send("Unauthorized")
 })
 
@@ -47,6 +55,27 @@ router.get('/:page', async (req, res) => {
         return res.status(400).send(error);
     }
 });
+router.put('/:page/edit', checkLoggedIn, async (req, res) => {
+    // @ts-ignore
+    const session_user_id = req?.user?.id;
+
+    const user: User = <User>await userService.fetchOne(session_user_id).catch(e => {
+        res.status(500).send(e)
+    })
+
+    if (getGrantedPermissions(user.permissions).includes(Permissions.PAGE_ADD)) {
+        const missingValues = ['content', 'name'].filter(key => !req.body[key]);
+        if (missingValues.length > 1) return res.status(new MissingValuesError(missingValues).statusCode).send({error: new MissingValuesError(missingValues)})
+        const org = <Page> await pageService.fetchOne(req.body.name);
+        const ins = <Page> await pageService.update(org.id,{
+            content: req.body.content
+        }).catch(e => {
+            return res.status(500).send(e)
+        })
+        console.log(ins)
+        res.status(200).send(await ins.toJSON())
+    } else return res.status(500).send("Unauthorized")
+})
 router.get('/', async (req:any, res:any) => {
     try {
         const Pages = await pageService.fetchAll().catch(e => { throw e })
@@ -56,3 +85,5 @@ router.get('/', async (req:any, res:any) => {
         return res.status(400).send(error);
     }
 });
+
+export default router;

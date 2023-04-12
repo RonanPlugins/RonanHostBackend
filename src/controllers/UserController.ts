@@ -34,7 +34,6 @@ router.get('/', async (req:any, res:any) => {
     }
 });
 
-// TODO ARR4NN setup
 router.post('/login', passport.authenticate('local'), async function (req:any, res:any) {
     res.send(req.user);
 });

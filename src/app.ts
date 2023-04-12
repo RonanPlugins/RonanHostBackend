@@ -61,8 +61,10 @@ passport.use(strategy);
 
 import ServerController from './controllers/ServerController.js';
 import userController from "./controllers/UserController.js";
+import pageController from "./controllers/PageController.js";
 app.use('/server', ServerController);
-app.use('/user', userController)
+app.use('/user', userController);
+app.use('/page', pageController)
 
 
 app.get("/", (req:any, res:any) => {

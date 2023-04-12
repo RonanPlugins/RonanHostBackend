@@ -19,6 +19,9 @@ export default class BaseService<
     async fetchOne(q:any): Promise<K | NotFoundError> {
         return await this.repository.fetchOne(q).catch(e => {throw e});
     }
+    async fetchAllBy(column: string, value: any): Promise<K[]> {
+        return await this.repository.fetchAllBy(column, value).catch(e => {throw e});
+    }
     async fetchAll(...q:any[]): Promise<K[] | NotFoundError> {
         return await this.repository.fetchAll(...q).catch(e => {throw e});
     }

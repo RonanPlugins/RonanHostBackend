@@ -1,12 +1,14 @@
 import express from "express";
-import { query } from "../util/data/database";
+import BannerRepository from "../repositories/BannerRepository.js";
+import BannerService from "../services/BannerService.js";
+
+const bannerService = new BannerService(new BannerRepository())
 
 const router = express.Router();
 
 router.get("/", async function (req, res, next) {
     try {
-        let banners = await query("SELECT * FROM website_banners WHERE enabled = 1");
-        return res.status(200).json(banners[0])
+        return res.status(200).json((await bannerService.fetchAllBy("enabled", true))[0])
     } catch (e) {
         console.log(e);
         res.status(400).json({ error: e, message: "Error" });
@@ -14,4 +16,3 @@ router.get("/", async function (req, res, next) {
 });
 
 export default router;
-

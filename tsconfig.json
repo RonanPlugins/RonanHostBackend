@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
     "experimentalDecorators": true,
-    "target": "es2020",
+    "target": "es2022",
     "moduleResolution": "node",
     "watch": true,
-    "module": "es2020",
+    "module": "es2022",
     "declaration": false,
     "esModuleInterop": true,
     "strictPropertyInitialization": false,

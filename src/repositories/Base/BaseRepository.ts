@@ -12,7 +12,10 @@ export default class BaseRepository<T extends {required: Record<string, any>}> {
         const rows = await query(`SELECT * FROM ${this.tableName()} ${this.buildWhereClause(q)}`, this.buildValues(q));
         return rows.map(row => this.createInstance(row));
     }
-
+    async fetchAllBy(column: string, value: any): Promise<T[]> {
+        const rows = await query(`SELECT * FROM ${this.tableName()} WHERE ${column} = ?`, [value]);
+        return rows.map(row => this.createInstance(row));
+    }
     async fetchOne(...q):Promise<T> {
         const rows = await query(`SELECT * FROM ${this.tableName()} ${this.buildWhereClause(q)} LIMIT 1`, this.buildValues(q)).catch(e => {console.error(e)});
         if (rows && rows.length) return rows.length ? this.createInstance(rows[0]) : undefined; else throw new NotFoundError(this.tableName(), q);

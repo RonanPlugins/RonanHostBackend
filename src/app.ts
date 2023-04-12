@@ -1,18 +1,28 @@
 import express from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv"
-dotenv.config();
-import { strategy } from './Strategies/local.js'
+import {strategy} from './Strategies/local.js'
 
 import passport from "passport";
 
 import {AppConfig, config as configLoader} from "../config.js";
-const config:AppConfig = configLoader ?? (() =>
-{ console.error("You are missing the config.yml file!\nExiting..."); process.exit(1); return undefined; })();
-
 import session from "express-session";
 import mysqlSession from "express-mysql-session";
 import {handleWebhook} from "./Events/stripe-webhook-handler.js";
+import ServerController from './controllers/ServerController.js';
+import userController from "./controllers/UserController.js";
+import pageController from "./controllers/PageController.js";
+import crypto from "./util/security/crypto.js";
+import {
+    getGrantedPermissions,
+    getGrantedPermissionsNames,
+    getPermissionInteger,
+    Permissions
+} from "./enum/Permissions.js";
+
+dotenv.config();
+const config:AppConfig = configLoader ?? (() =>
+{ console.error("You are missing the config.yml file!\nExiting..."); process.exit(1); return undefined; })();
 
 const app = express();
 
@@ -59,9 +69,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 passport.use(strategy);
 
-import ServerController from './controllers/ServerController.js';
-import userController from "./controllers/UserController.js";
-import pageController from "./controllers/PageController.js";
 app.use('/server', ServerController);
 app.use('/user', userController);
 app.use('/page', pageController)

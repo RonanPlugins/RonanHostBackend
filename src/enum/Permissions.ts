@@ -1,17 +1,18 @@
 export enum Permissions {
-    // Global permissions
-    GLOBAL_ALL = 1,
-    GLOBAL_READ = 2,
-    GLOBAL_ADD = 4,
-    GLOBAL_MODIFY = 8,
-    GLOBAL_DELETE = 16,
 
     // Page permissions
-    PAGE_ALL = 32,
-    PAGE_READ = 64,
-    PAGE_ADD = 128,
-    PAGE_MODIFY = 256,
-    PAGE_DELETE = 512,
+    PAGE_READ = 1,
+    PAGE_ADD = 2,
+    PAGE_MODIFY = 4,
+    PAGE_DELETE = 8,
+    PAGE_ALL = PAGE_READ|PAGE_ADD|PAGE_MODIFY|PAGE_DELETE,
+
+    // Global permissions
+    READ =  PAGE_READ,
+    ADD = PAGE_ADD,
+    MODIFY = PAGE_MODIFY,
+    DELETE = PAGE_DELETE,
+    ALL =  READ|ADD|MODIFY|DELETE,
 }
 
 export function getGrantedPermissions(permissions: number): Array<number> {
@@ -24,6 +25,19 @@ export function getGrantedPermissions(permissions: number): Array<number> {
     }
 
     return grantedPermissions;
+}
+export function getGrantedPermissionsNames(permissions: number): Array<string> {
+    const grantedPermissions: Array<number> = getGrantedPermissions(permissions);
+    const permissionNames: Array<string> = [];
+
+    for (const permission of grantedPermissions) {
+        const permissionName = Permissions[permission];
+        if (permissionName) {
+            permissionNames.push(permissionName);
+        }
+    }
+
+    return permissionNames;
 }
 
 export function getPermissionInteger(permissions: Permissions[]): number {

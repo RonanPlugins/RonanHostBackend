@@ -20,7 +20,7 @@ export default class BaseService<
         return await this.repository.fetchOne(q).catch(e => {throw e});
     }
     async fetchAll(...q:any[]): Promise<K[] | NotFoundError> {
-        return await this.repository.fetchAll(...q);
+        return await this.repository.fetchAll(...q).catch(e => {throw e});
     }
 
     public async update(id: UUID, entity: Partial<K>): Promise<K> {

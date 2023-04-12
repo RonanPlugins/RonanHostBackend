@@ -50,6 +50,7 @@ router.get('/:page', async (req, res) => {
     }
     try {
         const page: Page = <Page> await pageService.fetchOne(pageId).catch(e => {throw e})
+        console.log(await page.toJSON())
         return res.status(200).json({page: await page.toJSON()});
     } catch (error) {
         return res.status(400).send(error);
@@ -77,10 +78,10 @@ router.put('/:page/edit', checkLoggedIn, async (req, res) => {
     } else return res.status(500).send("Unauthorized")
 })
 router.get('/', async (req:any, res:any) => {
+    console.log("hey!")
     try {
-        const Pages = await pageService.fetchAll().catch(e => { throw e })
-        console.log(Pages)
-        return res.status(200).json(Pages);
+        const pages = <Page[]>await pageService.fetchAll().catch(e => { throw e })
+        return res.status(200).json(await Promise.all(pages.map(async page => await page.toJSON())));
     } catch (error) {
         return res.status(400).send(error);
     }

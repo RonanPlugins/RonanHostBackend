@@ -78,7 +78,6 @@ router.put('/:page/edit', checkLoggedIn, async (req, res) => {
     } else return res.status(500).send("Unauthorized")
 })
 router.get('/', async (req:any, res:any) => {
-    console.log("hey!")
     try {
         const pages = <Page[]>await pageService.fetchAll().catch(e => { throw e })
         return res.status(200).json(await Promise.all(pages.map(async page => await page.toJSON())));

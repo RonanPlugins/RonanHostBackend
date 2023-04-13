@@ -51,11 +51,8 @@ router.post('/create', async function (req:any, res:any) {
     const user:any = await userService.create({
         email: email, id: v4(), name: name, password: password
     }).catch((e) => {
-        console.log(e)
+        return res.status(500).send(e);
     })
-    //You need to send it as user.toJSON(["password"]) "password" makes it exclude password from result
-    // dont forget to await toJSON()
-    console.log(user)
     res.json(await user.toJSON(["password"]))
 
 })

@@ -12,7 +12,7 @@ import {handleWebhook} from "./Events/stripe-webhook-handler.js";
 import ServerController from './controllers/ServerController.js';
 import userController from "./controllers/UserController.js";
 import pageController from "./controllers/PageController.js";
-import metricsController from "./metrics/controller/metricsController.js";
+// import metricsController from "./metrics/controller/metricsController.js";
 import crypto from "./util/security/crypto.js";
 import {
     getGrantedPermissions,
@@ -73,7 +73,7 @@ passport.use(strategy);
 app.use('/server', ServerController);
 app.use('/user', userController);
 app.use('/page', pageController);
-app.use('/metrics', metricsController)
+// app.use('/metrics', metricsController)
 
 
 app.get("/", (req:any, res:any) => {

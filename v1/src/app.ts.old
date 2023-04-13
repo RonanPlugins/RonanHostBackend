@@ -1,14 +1,24 @@
 import express from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv"
-import {strategy} from '../v1/src/Strategies/local.js'
+import {strategy} from './Strategies/local.js'
 
 import passport from "passport";
 
 import {AppConfig, config as configLoader} from "../config.js";
 import session from "express-session";
 import mysqlSession from "express-mysql-session";
-import {handleWebhook} from "../v1/src/Events/stripe-webhook-handler.js";
+import {handleWebhook} from "./Events/stripe-webhook-handler.js";
+import ServerController from './controllers/ServerController.js';
+import userController from "./controllers/UserController.js";
+import pageController from "./controllers/PageController.js";
+import crypto from "./util/security/crypto.js";
+import {
+    getGrantedPermissions,
+    getGrantedPermissionsNames,
+    getPermissionInteger,
+    Permissions
+} from "./enum/Permissions.js";
 
 dotenv.config();
 const config:AppConfig = configLoader ?? (() =>
@@ -59,9 +69,14 @@ app.use(passport.initialize());
 app.use(passport.session());
 passport.use(strategy);
 
-import V1Controller from "../v1/src/router.js";
+app.use('/server', ServerController);
+app.use('/user', userController);
+app.use('/page', pageController)
 
-app.use("/v1",V1Controller)
+
+app.get("/", (req:any, res:any) => {
+    res.send("Hello, world!");
+});
 
 app.listen(config.app_port, async () => {
     console.log("Server listening on port "+config.app_port);

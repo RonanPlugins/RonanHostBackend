@@ -15,9 +15,7 @@ export default class BaseModel<T extends RequiredFields = RequiredFields> {
         exclude.push("required");
         return Object.entries(this).reduce(async (accPromise, [key, value]) => {
             const acc = await accPromise;
-            if (this.hasOwnProperty(key) && typeof value !== "function" && !exclude.includes(key)) {
-                acc[key] = value instanceof Promise ? await value : value;
-            }
+            if (this.hasOwnProperty(key) && typeof value !== "function" && !exclude.includes(key)) acc[key] = value instanceof Promise ? await value : value;
             return acc;
         }, Promise.resolve({}));
     }

@@ -39,17 +39,15 @@ router.post('/login', passport.authenticate('local'), async function (req:any, r
 });
 
 router.post('/create', async function (req:any, res:any) {
-    const { name, email, password } = req.body;
-    const missingValues = ['name', 'email', 'password'].filter(key => !req.body[key]);
+    const { name, email, password, username } = req.body;
+    const missingValues = ['name', 'email', 'password', 'username'].filter(key => !req.body[key]);
     if (missingValues.length > 1) {
         const MVE = new MissingValuesError(missingValues);
-        console.log(MVE.statusCode)
-        res.status(MVE.statusCode).send({ error: MVE })
-        return;
+        return res.status(MVE.statusCode).send({ error: MVE })
     }
 
     const user:any = await userService.create({
-        email: email, id: v4(), name: name, password: password
+        email: email, id: v4(), name: name, password: password, username: username
     }).catch((e) => {
         return res.status(500).send(e);
     })

@@ -13,9 +13,10 @@ const pteroClient = new Pterodactyl.Builder()
     .asAdmin();
 
 export interface UserRequiredFields extends RequiredFields {
-    email: string,
-    name: string,
-    password: string
+    email: string;
+    name: string;
+    username: string;
+    password: string;
 }
 export default class User extends BaseModel<UserRequiredFields> {
     required: UserRequiredFields
@@ -25,23 +26,24 @@ export default class User extends BaseModel<UserRequiredFields> {
     @AutoAccessor()
     public name: string;
     @AutoAccessor()
+    public username: string;
+    @AutoAccessor()
     public readonly pterodactyl_user_id: number;
     private _pterodactyl_user: any;
     @AutoAccessor()
     public stripe_customer_id: string;
     private _stripe_customer: any;
-
     @AutoAccessor()
     public password: Hashed<string>|String;
-
     @AutoAccessor()
     public permissions: number;
 
-    constructor(id: UUID, email: string, name: string, pterodactyl_user_id: number, stripe_customer_id: string,
+    constructor(id: UUID, email: string, name: string, username: string, pterodactyl_user_id: number, stripe_customer_id: string,
                 password: Hashed<string>|string, permissions: number) {
         super(id)
         this.email = email;
         this.name = name;
+        this.username = username;
         this.pterodactyl_user_id = pterodactyl_user_id;
         this.stripe_customer_id = stripe_customer_id;
         this.password = password;
@@ -55,7 +57,7 @@ export default class User extends BaseModel<UserRequiredFields> {
     @AutoAccessor()
     public get pterodactyl_user(): Promise<any> {
         if (!this._pterodactyl_user) return this.loadPterodactylUser();
-        return Promise.resolve(this._pterodactyl_user);
+        return this._pterodactyl_user;
     }
 
     async loadStripeCustomer(): Promise<void> {

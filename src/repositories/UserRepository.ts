@@ -17,6 +17,7 @@ const pteroClient = new Pterodactyl.Builder()
 const stripeApi = new StripeApiClient(process.env.STRIPE_API_KEY)
 
 export default class UserRepository extends BaseRepository<User> {
+    protected stringFields: string[] = ['id', 'email', 'name', 'username', 'pterodactyl_user_id', 'stripe_customer_id'];
 
     constructor() {
         // @ts-ignore
@@ -38,7 +39,7 @@ export default class UserRepository extends BaseRepository<User> {
         }).catch(err => { throw new Error("Username or email is already taken")})
         const res:User = await this.insert(data).catch(e => {throw e})
         const stripeUser = await stripeApi.createCustomer(
-            new User(res.id, data.email, firstName+lastName, pteroUser.id, String(pteroUser.id), undefined, undefined))
+            new User(res.id, data.email, data.name, data.username, pteroUser.id, String(pteroUser.id), undefined, undefined))
         return await this.update(res.id, {stripe_customer_id: stripeUser.id, pterodactyl_user_id: pteroUser.id})
     }
     tableName()  {

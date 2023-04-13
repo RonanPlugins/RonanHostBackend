@@ -7,6 +7,7 @@ import UserRepository from "../repositories/UserRepository.js"
 import iUserService from "../services/UserService.js"
 import randomResponse from "../util/message/checkLoggedInFailedResponse.js";
 import User from "../models/User.js";
+import e from "express";
 
 const userService: iUserService = new iUserService(new UserRepository())
 
@@ -23,7 +24,7 @@ router.get('/', async (req:any, res:any) => {
         res.status(MVE.statusCode).body({error: MVE})
     }
     try {
-        const user: User = await userService.fetchOne(query).catch(e => {return e});
+        const user: User = await userService.fetchOne(query).catch(e => {return res.send(e)});
         return res.status(200).json(await user.toJSON(["password"]))
     } catch (error) {
         console.error(error)
@@ -45,15 +46,12 @@ router.post('/create', async function (req:any, res:any) {
         const MVE = new MissingValuesError(missingValues);
         return res.status(MVE.statusCode).send({ error: MVE })
     }
-
     const user:any = await userService.create({
         email: email, id: v4(), name: name, password: password, username: username
     }).catch((e) => {
-        return res.status(500).send(e);
+        res.status(500).send(e.message); return undefined;
     })
-    if (!user) return res.status(500).send({ error: true, message: "User is null" })
-    res.json(await user.toJSON(["password"]))
-
+    if (user) return res.status(200).json(await user.toJSON(["password"]));
 })
 
 

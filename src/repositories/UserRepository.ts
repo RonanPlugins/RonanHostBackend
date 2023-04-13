@@ -30,13 +30,13 @@ export default class UserRepository extends BaseRepository<User> {
     }
 
     async create(data: User["required"]): Promise<User> {
-        console.log(data)
         const firstName = data.name.split(' ')[0]
         const lastName = data.name.split(' ')[1]
 
         const pteroUser = await pteroClient.createUser({
             email: data.email, firstName: firstName, lastName: lastName, username: firstName+lastName
-        }).catch(err => { throw new Error("Username or email is already taken")})
+        }).catch(err => {throw new Error("Username or email is already taken")})
+
         const res:User = await this.insert(data).catch(e => {throw e})
         const stripeUser = await stripeApi.createCustomer(
             new User(res.id, data.email, data.name, data.username, pteroUser.id, String(pteroUser.id), undefined, undefined))

@@ -51,6 +51,7 @@ router.post('/create', async function (req:any, res:any) {
     }).catch((e) => {
         return res.status(500).send(e);
     })
+    if (!user) return res.status(500).send({ error: true, message: "User is null" })
     res.json(await user.toJSON(["password"]))
 
 })

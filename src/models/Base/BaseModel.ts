@@ -12,7 +12,6 @@ export default class BaseModel<T extends RequiredFields = RequiredFields> {
     }
 
     async toJSON(exclude: string[] = []): Promise<{ [p: string]: any }> {
-        exclude.push("required");
         return Object.entries(this).reduce(async (accPromise, [key, value]) => {
             const acc = await accPromise;
             if (this.hasOwnProperty(key) && typeof value !== "function" && !exclude.includes(key)) acc[key] = value instanceof Promise ? await value : value;

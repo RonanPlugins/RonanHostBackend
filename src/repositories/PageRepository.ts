@@ -18,6 +18,11 @@ export default class PageRepository extends BaseRepository<Page> {
         return super.fetchAll(...q);
     }
 
+    @UpdateCacheOnUpdate()
+    async delete(id: String): Promise<Boolean> {
+        return super.delete(id);
+    }
+
     @Memorize()
     async fetchOne(...q): Promise<Page> {
         return super.fetchOne(...q);

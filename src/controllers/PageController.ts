@@ -56,10 +56,12 @@ router.delete('/:page/delete', async (req, res) => {
 
     if (!getGrantedPermissions(user.permissions).includes(Permissions.PAGE_DELETE)) return res.status(500).send("Unauthorized");
 
-    await pageService.delete(page.id).catch(e => res.status(500).send({ success: false, message: "Page not found." }));
-
+    try {
+        await pageService.delete(page.id)
+    } catch(e) {
+        return res.status(500).send({ success: false, message: "Page not found." })
+    }
     res.status(200).send({ success: true });
-
 });
 
 

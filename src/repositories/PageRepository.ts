@@ -1,6 +1,6 @@
 import BaseRepository from "./Base/BaseRepository.js";
 import Page from "../models/Page.js";
-import Memorize, {ResetCache, UpdateCache, UpdateCacheOnUpdate} from "../util/decorators/Memorize.js";
+import {Memorize, ResetCache, UpdateCacheOnUpdate} from "../util/decorators/Memorize.js";
 import {v4} from "../util/functions/UUID.js";
 
 export default class PageRepository extends BaseRepository<Page> {

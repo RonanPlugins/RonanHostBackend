@@ -1,6 +1,6 @@
 import BaseModel, {RequiredFields} from "./Base/BaseModel.js";
 import {AutoAccessor} from "../util/decorators/AutoAccessor.js";
-import Memorize from "../util/decorators/Memorize.js";
+import {Memorize} from "../util/decorators/Memorize.js";
 
 interface BannerRequiredFields extends RequiredFields{
     minutes_between_popup: number;

@@ -80,26 +80,30 @@ router.get('/:page', async (req, res) => {
         return res.status(400).send(error);
     }
 });
-router.put('/:page/edit', checkLoggedIn, async (req, res) => {
+router.put('/:page/edit', async (req, res) => {
     // @ts-ignore
-    const session_user_id = req?.user?.id;
+    // const session_user_id = req?.user?.id;
 
-    const user: User = <User>await userService.fetchOne(session_user_id).catch(e => {
-        res.status(500).send(e)
-    })
+    // const user: User = <User>await userService.fetchOne(session_user_id).catch(e => {
+    //     return undefined;
+    // })
+    // if (!user) return res.status(500).send(new NotFoundError("user", session_user_id))
 
-    if (getGrantedPermissions(user.permissions).includes(Permissions.PAGE_ADD)) {
-        const missingValues = ['content', 'name'].filter(key => !req.body[key]);
+    // if (getGrantedPermissions(user.permissions).includes(Permissions.PAGE_ADD)) {
+        const missingValues = ['content'].filter(key => !req.body[key]);
         if (missingValues.length > 1) return res.status(new MissingValuesError(missingValues).statusCode).send({ error: new MissingValuesError(missingValues) })
-        const org = <Page>await pageService.fetchOne(req.body.name);
+        const org = <Page>await pageService.fetchOne(req.params.page).catch(e => {return undefined});
+        if (!org) return res.status(500).send(new NotFoundError("page", req.params.page))
         const ins = <Page>await pageService.update(org.id, {
             content: req.body.content
         }).catch(e => {
-            return res.status(500).send(e)
+            console.log(e)
+            return undefined;
         })
+    if (!ins) return res.status(500).send("internal err")
         console.log(ins)
         res.status(200).send(await ins.toJSON())
-    } else return res.status(500).send("Unauthorized")
+    // } else return res.status(500).send("Unauthorized")
 })
 router.get('/', async (req: any, res: any) => {
     try {

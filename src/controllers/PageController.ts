@@ -7,8 +7,10 @@ import PageRepository from "../repositories/PageRepository.js";
 import UserService from "../services/UserService.js";
 import UserRepository from "../repositories/UserRepository.js";
 import User from "../models/User.js";
-import {getGrantedPermissions, Permissions} from "../enum/Permissions.js";
-import {v4} from "../util/functions/UUID.js";
+import { getGrantedPermissions, Permissions } from "../enum/Permissions.js";
+import { v4 } from "../util/functions/UUID.js";
+import { ResetCache } from "../util/decorators/Memorize.js";
+import { UUID } from "crypto";
 
 const router = express.Router();
 
@@ -16,7 +18,7 @@ const pageService = new PageService(new PageRepository())
 const userService = new UserService(new UserRepository())
 
 function checkLoggedIn(req, res, next) {
-    if (req?.user) next(); else return res.status(403).json({ error: true, message: randomResponse().message});
+    if (req?.user) next(); else return res.status(403).json({ error: true, message: randomResponse().message });
 }
 
 
@@ -30,7 +32,8 @@ router.post('/create', checkLoggedIn, async (req, res) => {
 
     if (getGrantedPermissions(user.permissions).includes(Permissions.PAGE_ADD)) {
         const missingValues = ['content', 'name'].filter(key => !req.body[key]);
-        if (missingValues.length > 1) return res.status(new MissingValuesError(missingValues).statusCode).send({error: new MissingValuesError(missingValues)})
+        if (missingValues.length > 1) return res.status(new MissingValuesError(missingValues).statusCode).send({ error: new MissingValuesError(missingValues) })
+        ResetCache()
         const ins = await pageService.insert({
             content: req.body.content, id: v4(), name: req.body.name
         }).catch(e => {
@@ -40,18 +43,55 @@ router.post('/create', checkLoggedIn, async (req, res) => {
         res.status(200).send(await ins.toJSON())
     } else return res.status(500).send("Unauthorized")
 })
+router.delete('/:page/delete', checkLoggedIn, async (req, res) => {
+    console.log("1")
+    // @ts-ignore
+    const session_user_id = req?.user?.id;
+    console.log("2")
+
+    const pageId = req.params.page;
+    console.log("3")
+
+
+    const user: User = <User>await userService.fetchOne(session_user_id).catch(e => {
+        console.log("4")
+
+        res.status(500).send(e)
+    })
+    console.log("5")
+
+    if (getGrantedPermissions(user.permissions).includes(Permissions.PAGE_DELETE)) {
+        console.log("6")
+
+        ResetCache()
+        console.log("7")
+
+        const ins = await pageService.delete(pageId)
+            .catch(e => {
+                console.log("8")
+
+                return res.status(500).send({ success: false, message: "Page not found." })
+            })
+        console.log("9")
+
+        // console.log(ins)
+        res.status(200).send({ success: true })
+        console.log("10")
+
+    } else return res.status(500).send("Unauthorized")
+})
 
 router.get('/:page', async (req, res) => {
     const pageId = req.params.page;
     const missingValues = ['query'].filter(key => !req.params[key]);
     if (missingValues.length > 1) {
         const MVE = new MissingValuesError(missingValues);
-        res.status(MVE.statusCode).send({error: MVE})
+        res.status(MVE.statusCode).send({ error: MVE })
     }
     try {
-        const page: Page = <Page> await pageService.fetchOne(pageId).catch(e => {throw e})
+        const page: Page = <Page>await pageService.fetchOne(pageId).catch(e => { throw e })
         console.log(await page.toJSON())
-        return res.status(200).json({page: await page.toJSON()});
+        return res.status(200).json({ page: await page.toJSON() });
     } catch (error) {
         return res.status(400).send(error);
     }
@@ -66,9 +106,9 @@ router.put('/:page/edit', checkLoggedIn, async (req, res) => {
 
     if (getGrantedPermissions(user.permissions).includes(Permissions.PAGE_ADD)) {
         const missingValues = ['content', 'name'].filter(key => !req.body[key]);
-        if (missingValues.length > 1) return res.status(new MissingValuesError(missingValues).statusCode).send({error: new MissingValuesError(missingValues)})
-        const org = <Page> await pageService.fetchOne(req.body.name);
-        const ins = <Page> await pageService.update(org.id,{
+        if (missingValues.length > 1) return res.status(new MissingValuesError(missingValues).statusCode).send({ error: new MissingValuesError(missingValues) })
+        const org = <Page>await pageService.fetchOne(req.body.name);
+        const ins = <Page>await pageService.update(org.id, {
             content: req.body.content
         }).catch(e => {
             return res.status(500).send(e)
@@ -77,7 +117,7 @@ router.put('/:page/edit', checkLoggedIn, async (req, res) => {
         res.status(200).send(await ins.toJSON())
     } else return res.status(500).send("Unauthorized")
 })
-router.get('/', async (req:any, res:any) => {
+router.get('/', async (req: any, res: any) => {
     try {
         const pages = <Page[]>await pageService.fetchAll().catch(e => { throw e })
         return res.status(200).json(await Promise.all(pages.map(async page => await page.toJSON())));

@@ -2,6 +2,7 @@ import { query } from '../../util/data/database.js';
 import NotFoundError from "../../Error/NotFoundError.js";
 import DuplicateError from "../../Error/DuplicateError.js";
 import {UUID} from "../../util/functions/UUID.js";
+import { resolve } from 'path';
 
 /**
  * Base repository for CRUD operations on a database table
@@ -171,14 +172,17 @@ export default class BaseRepository<T extends {required: Record<string, any>}> {
     }
     /**
      * Deletes an object from the table with the given ID
-     * @param {UUID} id - The ID of the object to delete
-     * @returns {Promise<void>} - A promise that resolves when the object has been deleted
+     * @param {String} id - The ID of the object to delete
+     * @returns {Promise<Boolean>} - A promise that resolves when the object has been deleted
      * @throws {NotFoundError} - If no object is found with the given ID
      */
-    async delete(id: UUID): Promise<void> {
+    async delete(id: String): Promise<Boolean> {
         const result = await query(`DELETE FROM ${this.tableName()} WHERE id = ?`, [id]);
         if (result.affectedRows === 0) {
             throw new NotFoundError(this.tableName(), id);
+        }
+        if (result.affectedRows > 0) {
+            return true;
         }
     }
     /**

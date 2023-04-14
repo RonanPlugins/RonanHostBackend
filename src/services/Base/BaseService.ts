@@ -62,7 +62,7 @@ export default class BaseService<
         return await this.repository.update(id, updated);
     }
 
-    async delete(id: UUID): Promise<void> {
-        await this.repository.delete(id).catch(e => {throw e});
+    async delete(id: String): Promise<Boolean> {
+        return await this.repository.delete(id).catch(e => {throw e});
     }
 }

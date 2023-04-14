@@ -102,6 +102,7 @@ router.put('/:page/edit', checkLoggedIn, async (req, res) => {
 router.get('/', async (req: any, res: any) => {
     try {
         const pages = <Page[]>await pageService.fetchAll().catch(e => { throw e })
+        console.log(pages)
         return res.status(200).json(await Promise.all(pages.map(async page => await page.toJSON())));
     } catch (error) {
         return res.status(400).send(error);

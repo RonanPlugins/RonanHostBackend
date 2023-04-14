@@ -21,7 +21,7 @@ export default class Page extends BaseModel<PageRequiredFields> {
         this.content = content;
     }
 
-    @UpdateCache()
+    @Memorize()
     async toJSON(exclude: string[] = []): Promise<{ [p: string]: any }> {
         return super.toJSON(exclude);
     }

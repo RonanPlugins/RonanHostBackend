@@ -48,8 +48,6 @@ export function UpdateCacheOnUpdate() {
         return descriptor;
     };
 }
-
-
 export function UpdateCache() {
     return function(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
         const originalMethod = descriptor.value;

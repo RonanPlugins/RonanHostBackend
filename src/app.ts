@@ -12,6 +12,7 @@ import {handleWebhook} from "./Events/stripe-webhook-handler.js";
 import ServerController from './controllers/ServerController.js';
 import userController from "./controllers/UserController.js";
 import pageController from "./controllers/PageController.js";
+import bannerController from "./controllers/BannerController.js";
 // import metricsController from "./metrics/controller/metricsController.js";
 import crypto from "./util/security/crypto.js";
 import {
@@ -53,12 +54,16 @@ app.use((req:any, res:any, next:any) => {
     if (config.allowedOrigins.includes(origin)) {
         res.setHeader('Access-Control-Allow-Origin', origin);
     }
-    //res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:8020');
-    res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.header('Access-Control-Allow-Credentials', true);
-    return next();
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    if (req.method === 'OPTIONS') {
+        res.sendStatus(200);
+    } else {
+        next();
+    }
 });
+
 
 app.post('/webhooks/stripe', bodyParser.raw({ type: 'application/json' }), handleWebhook);
 
@@ -73,6 +78,7 @@ passport.use(strategy);
 app.use('/server', ServerController);
 app.use('/user', userController);
 app.use('/page', pageController);
+app.use('/banners', bannerController);
 // app.use('/metrics', metricsController)
 
 

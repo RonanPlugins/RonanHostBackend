@@ -40,7 +40,6 @@ router.post('/create', checkLoggedIn, async (req, res) => {
         }).catch(e => {
             return res.status(500).send(e)
         })
-        console.log(ins)
         res.status(200).send(await ins.toJSON())
     } else return res.status(500).send("Unauthorized")
 })
@@ -74,7 +73,6 @@ router.get('/:page', async (req, res) => {
     }
     try {
         const page: Page = <Page>await pageService.fetchOne(pageId).catch(e => { throw e })
-        console.log(await page.toJSON())
         return res.status(200).json({ page: await page.toJSON() });
     } catch (error) {
         return res.status(400).send(error);
@@ -90,21 +88,19 @@ router.put('/:page/edit', checkLoggedIn, async (req, res) => {
 
     if (getGrantedPermissions(user.permissions).includes(Permissions.PAGE_ADD)) {
         const missingValues = ['content', 'name'].filter(key => !req.body[key]);
-        if (missingValues.length > 1) return res.status(new MissingValuesError(missingValues).statusCode).send({ error: new MissingValuesError(missingValues) })
+        if (missingValues.length >= 1) return res.status(new MissingValuesError(missingValues).statusCode).send({ error: new MissingValuesError(missingValues) })
         const org = <Page>await pageService.fetchOne(req.body.name);
         const ins = <Page>await pageService.update(org.id, {
             content: req.body.content
         }).catch(e => {
             return res.status(500).send(e)
         })
-        console.log(ins)
         res.status(200).send(await ins.toJSON())
     } else return res.status(500).send("Unauthorized")
 })
 router.get('/', async (req: any, res: any) => {
     try {
         const pages = <Page[]>await pageService.fetchAll().catch(e => { throw e })
-        console.log(pages)
         return res.status(200).json(await Promise.all(pages.map(async page => await page.toJSON())));
     } catch (error) {
         return res.status(400).send(error);

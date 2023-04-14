@@ -13,6 +13,7 @@ import ServerController from './controllers/ServerController.js';
 import userController from "./controllers/UserController.js";
 import pageController from "./controllers/PageController.js";
 import bannerController from "./controllers/BannerController.js";
+import statisticsController from "./controllers/StatisticsController.js";
 // import metricsController from "./metrics/controller/metricsController.js";
 import crypto from "./util/security/crypto.js";
 import {
@@ -79,6 +80,7 @@ app.use('/server', ServerController);
 app.use('/user', userController);
 app.use('/page', pageController);
 app.use('/banners', bannerController);
+app.use('/statistics', statisticsController);
 // app.use('/metrics', metricsController)
 
 

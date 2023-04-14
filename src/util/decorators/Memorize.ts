@@ -23,6 +23,7 @@ export function memoizeAsync(fn: (...args: any[]) => Promise<any>): (...args: an
         return result;
     };
 }
+
 export function updateCache(fn: (...args: any[]) => Promise<any>, args: any[], result: any) {
     const key = JSON.stringify(args);
     // @ts-ignore

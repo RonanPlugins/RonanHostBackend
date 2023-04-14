@@ -36,6 +36,20 @@ export function ResetCache() {
     };
 }
 
+export function UpdateCacheOnUpdate() {
+    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+        const originalMethod = descriptor.value;
+        descriptor.value = async function (...args) {
+            const result = await originalMethod.apply(this, args);
+            // Update the cache for the fetchOne method
+            await this.fetchOne.updateCache(args[0]);
+            return result;
+        };
+        return descriptor;
+    };
+}
+
+
 export function UpdateCache() {
     return function(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
         const originalMethod = descriptor.value;

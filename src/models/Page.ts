@@ -1,7 +1,7 @@
 import {UUID} from "../util/functions/UUID.js";
 import {AutoAccessor} from "../util/decorators/AutoAccessor.js";
 import BaseModel, {RequiredFields} from "./Base/BaseModel.js";
-import Memorize from "../util/decorators/Memorize.js";
+import Memorize, {UpdateCache} from "../util/decorators/Memorize.js";
 
 export interface PageRequiredFields extends RequiredFields {
     name: string;
@@ -21,7 +21,7 @@ export default class Page extends BaseModel<PageRequiredFields> {
         this.content = content;
     }
 
-    @Memorize()
+    @UpdateCache()
     async toJSON(exclude: string[] = []): Promise<{ [p: string]: any }> {
         return super.toJSON(exclude);
     }

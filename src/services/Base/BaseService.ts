@@ -6,7 +6,7 @@ import NotFoundError from "../../Error/NotFoundError.js";
 export default class BaseService<
     T extends BaseRepository<K>,
     K extends { required: Record<string, any> }> {
-    protected repository: T;
+    public repository: T;
 
     constructor(repository: T) {
         this.repository = repository;

@@ -7,14 +7,19 @@ export default function Memorize() {
 }
 
 export function memoizeAsync(fn: (...args: any[]) => Promise<any>): (...args: any[]) => Promise<any> {
-    const cache = new Map();
+    const cache = new WeakMap();
     return async function (...args) {
         const key = JSON.stringify(args);
-        if (cache.has(key)) {
-            return cache.get(key);
+        let instanceCache = cache.get(this);
+        if (!instanceCache) {
+            instanceCache = new Map();
+            cache.set(this, instanceCache);
+        }
+        if (instanceCache.has(key)) {
+            return instanceCache.get(key);
         }
         const result = await fn.apply(this, args);
-        cache.set(key, result);
+        instanceCache.set(key, result);
         return result;
     };
 }

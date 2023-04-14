@@ -11,6 +11,7 @@ import { getGrantedPermissions, Permissions } from "../enum/Permissions.js";
 import { v4 } from "../util/functions/UUID.js";
 import { ResetCache } from "../util/decorators/Memorize.js";
 import { UUID } from "crypto";
+import NotFoundError from "../Error/NotFoundError.js";
 
 const router = express.Router();
 
@@ -43,43 +44,24 @@ router.post('/create', checkLoggedIn, async (req, res) => {
         res.status(200).send(await ins.toJSON())
     } else return res.status(500).send("Unauthorized")
 })
-router.delete('/:page/delete', checkLoggedIn, async (req, res) => {
-    console.log("1")
+router.delete('/:page/delete', async (req, res) => {
     // @ts-ignore
     const session_user_id = req?.user?.id;
-    console.log("2")
 
-    const pageId = req.params.page;
-    console.log("3")
+    const page = await pageService.fetchOne(req.params.page).catch(e => {return undefined});
+    const user = await userService.fetchOne(session_user_id).catch(e => {return undefined});
 
+    if (!page) return res.status(401).send(new NotFoundError("page", req.params.page));
+    if (!user) return res.status(401).send(new NotFoundError("user", session_user_id));
 
-    const user: User = <User>await userService.fetchOne(session_user_id).catch(e => {
-        console.log("4")
+    if (!getGrantedPermissions(user.permissions).includes(Permissions.PAGE_DELETE)) return res.status(500).send("Unauthorized");
 
-        res.status(500).send(e)
-    })
-    console.log("5")
+    await pageService.delete(page.id).catch(e => res.status(500).send({ success: false, message: "Page not found." }));
 
-    if (getGrantedPermissions(user.permissions).includes(Permissions.PAGE_DELETE)) {
-        console.log("6")
+    res.status(200).send({ success: true });
 
-        ResetCache()
-        console.log("7")
+});
 
-        const ins = await pageService.delete(pageId)
-            .catch(e => {
-                console.log("8")
-
-                return res.status(500).send({ success: false, message: "Page not found." })
-            })
-        console.log("9")
-
-        // console.log(ins)
-        res.status(200).send({ success: true })
-        console.log("10")
-
-    } else return res.status(500).send("Unauthorized")
-})
 
 router.get('/:page', async (req, res) => {
     const pageId = req.params.page;

@@ -6,7 +6,7 @@ export default function Memorize() {
     }
 }
 
-export function memoizeAsync(fn: (...args: any[]) => Promise<any>): (...args: any[]) => Promise<any> {
+function memoizeAsync(fn: (...args: any[]) => Promise<any>): (...args: any[]) => Promise<any> {
     const cache = new WeakMap();
     return async function (...args) {
         const key = JSON.stringify(args);
@@ -22,16 +22,6 @@ export function memoizeAsync(fn: (...args: any[]) => Promise<any>): (...args: an
         instanceCache.set(key, result);
         return result;
     };
-}
-
-export function updateCache(fn: (...args: any[]) => Promise<any>, args: any[], result: any) {
-    const key = JSON.stringify(args);
-    // @ts-ignore
-    const cache = fn.cache as Map<string, any>;
-    if (cache.has(key)) {
-        cache.delete(key);
-    }
-    cache.set(key, result);
 }
 export function ResetCache() {
     return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {

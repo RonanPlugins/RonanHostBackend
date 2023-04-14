@@ -10,6 +10,8 @@ dotenv.config()
 import Pterodactyl, {Server, ServerFeatureLimits, ServerLimits} from '@avionrx/pterodactyl-js';
 import {findAvailableNode} from "../util/nodes/NodeAllocator.js";
 import NotFoundError from "../Error/NotFoundError.js";
+import e from "express";
+import * as process from "process";
 
 const pteroClient = new Pterodactyl.Builder()
     .setURL(process.env.PTERODACTYL_BASE_URL)
@@ -19,109 +21,113 @@ const pteroClient = new Pterodactyl.Builder()
 const stripeApi = new StripeApiClient(process.env.STRIPE_API_KEY)
 const customerApi = new CustomerRepository()
 
-
 export async function handleWebhook(request, response) {
     const sig = request.headers['stripe-signature'];
     let event;
 
     try {
-        event = stripe.webhooks.constructEvent(request.body, sig, "whsec_1063964c9e532dfda4ea7eb183ba7cc5de299ea29313efbbeba29d5e46d7fa3e");
+        event = stripe.webhooks.constructEvent(request.body, sig, process.env.STRIPE_SIGNING_SECRET);
     } catch (err) {
         response.status(400).send(`Webhook Error: ${err.message}`);
     }
 
     switch (event.type) {
         case 'customer.subscription.updated': {
-            const subscription = event.data.object as Stripe.Subscription;
-            const customerId = subscription.customer as string;
-            const customer = await stripe.customers.retrieve(customerId);
+            try {
+                const subscription = event.data.object as Stripe.Subscription;
+                const customerId = subscription.customer as string;
+                const customer = await stripe.customers.retrieve(customerId);
 
-            // Get the customer's information from your database using their Stripe customer ID
-            const stripeCustomer = await stripeApi.getCustomer(customer.id);
-            const customerObj = await customerApi.fetchOne(customer.id).catch(e => {return e});
-            const pteroUser = await pteroClient.getUser(String(customerObj.pterodactyl_user_id));
+                // Get the customer's information from your database using their Stripe customer ID
+                const stripeCustomer = await stripeApi.getCustomer(customer.id);
+                const customerObj = await customerApi.fetchOne(customer.id).catch(e => {return e});
+                const pteroUser = await pteroClient.getUser(String(customerObj.pterodactyl_user_id));
 
-            const servers = (await pteroClient.getServers()).filter(server => server.user === pteroUser.id);
+                const servers = (await pteroClient.getServers()).filter(server => server.user === pteroUser.id);
 
-            console.log(subscription.metadata.servers)
-            const serverFiltered = servers.filter(server => server.id === parseInt(JSON.parse(subscription.metadata.servers)));
+                console.log(subscription.metadata.servers)
+                const serverFiltered = servers.filter(server => server.id === parseInt(JSON.parse(subscription.metadata.servers)));
 
-            for (const server of serverFiltered) {
-                const serFu:Pterodactyl.Server = await pteroClient.getServer(String(server.id))
+                for (const server of serverFiltered) {
+                    const serFu:Pterodactyl.Server = await pteroClient.getServer(String(server.id))
 
-                const productId = subscription.items.data[0].price.product;
+                    const product = subscription.items.data[0];
+                    const plan = product.metadata
 
-                const plansFDB = await query('SELECT * FROM plan where stripe_product_id = ?', [productId])
-                const plan = plansFDB[0]
-
-                const availableNodes = await findAvailableNode(pteroClient, plan.memory)
+                    const availableNodes = await findAvailableNode(pteroClient, plan.memory)
 // Update server feature limits
-                const featureLimits: ServerFeatureLimits = {
-                    databases: plan.databases,
-                    allocations: plan.allocations,
-                    backups: plan.backups
-                };
-                await serFu.setAllocationAmount(featureLimits.allocations);
-                await serFu.setDatabaseAmount(featureLimits.databases);
-                // TODO Avion Fix
-                // await serFu.setBackupsAmount(featureLimits.backups);
+                    const featureLimits: ServerFeatureLimits = {
+                        databases: Number(plan.databases),
+                        allocations: Number(plan.allocations),
+                        backups: Number(plan.backups),
+                        split_limit: Number(plan.splits)
+                    };
+                    await serFu.setAllocationAmount(featureLimits.allocations);
+                    await serFu.setDatabaseAmount(featureLimits.databases);
+                    await serFu.setBackupsAmount(featureLimits.backups);
+                    await serFu.setSplit_limitAmount(featureLimits.split_limit)
 
-                const updatedLimits: ServerLimits = {
-                    cpu: plan.cpu,
-                    disk: plan.disk,
-                    io: plan.io,
-                    memory: plan.memory,
-                    swap: plan.swap,
+                    const updatedLimits: ServerLimits = {
+                        cpu: Number(plan.cpu),
+                        disk: Number(plan.disk),
+                        io: Number(plan.io),
+                        memory: Number(plan.memory),
+                        swap: Number(plan.swap),
+                    }
+
+                    await serFu.setCPU(updatedLimits.cpu);
+                    await serFu.setDisk(updatedLimits.disk);
+                    await serFu.setIO(updatedLimits.io);
+                    await serFu.setMemory(updatedLimits.memory);
+                    await serFu.setSwap(updatedLimits.swap);
                 }
-
-                await serFu.setCPU(updatedLimits.cpu);
-                await serFu.setDisk(updatedLimits.disk);
-                await serFu.setIO(updatedLimits.io);
-                await serFu.setMemory(updatedLimits.memory);
-                await serFu.setSwap(updatedLimits.swap);
-            }
+            } catch (e)  {console.error(e)}
 
             break;
         }
         case 'customer.subscription.deleted': {
-            const subscription = event.data.object as Stripe.Subscription;
-            const customerId = subscription.customer as string;
-            const customer = await stripe.customers.retrieve(customerId);
+            try {
+                const subscription = event.data.object as Stripe.Subscription;
+                const customerId = subscription.customer as string;
+                const customer = await stripe.customers.retrieve(customerId);
 
-            // Get the customer's information from your database using their Stripe customer ID
-            const stripeCustomer = await stripeApi.getCustomer(customer.id);
-            const customerObj = await customerApi.fetchOne(customer.id);
-            const pteroUser = await pteroClient.getUser(String(customerObj.pterodactyl_user_id));
+                // Get the customer's information from your database using their Stripe customer ID
+                const stripeCustomer = await stripeApi.getCustomer(customer.id);
+                const customerObj = await customerApi.fetchOne(customer.id);
+                const pteroUser = await pteroClient.getUser(String(customerObj.pterodactyl_user_id));
 
-            const servers = (await pteroClient.getServers()).filter(server => server.user === pteroUser.id);
+                const servers = (await pteroClient.getServers()).filter(server => server.user === pteroUser.id);
 
-            const serverFiltered = servers.filter(server => JSON.parse(subscription.metadata.servers).includes(server.id));
-            console.log(serverFiltered)
-            for (const server of serverFiltered) {
-                const serFu = await pteroClient.getServer(String(server.id))
-                await serFu.suspend().catch(e => {
-                    console.log(e)
-                })
-            }
-
+                const serverFiltered = servers.filter(server => JSON.parse(subscription.metadata.servers).includes(server.id));
+                console.log(serverFiltered)
+                for (const server of serverFiltered) {
+                    const serFu = await pteroClient.getServer(String(server.id))
+                    await serFu.suspend().catch(e => {
+                        console.log(e)
+                    })
+                }
+            } catch (e) {console.error(e)}
             break;
         }
         case 'customer.subscription.created': {
+            console.log(1)
             const subServers:number[] = [];
             try {
                 const subscription = event.data.object as Stripe.Subscription;
                 const customerId = subscription.customer as string;
                 const customer = await stripe.customers.retrieve(customerId);
+                console.log(2)
                 // Get customer information from a database using Stripe customer ID
                 const stripeCustomer = await stripeApi.getCustomer(customer.id);
                 const customerObj = await customerApi.fetchOne(customer.id);
                 const pteroUser = await pteroClient.getUser(String(customerObj.pterodactyl_user_id));
+                console.log(3)
                 // Loop through subscription items and create a server for each
                 for (const item of subscription.items.data) {
                     for (let i = 0; i < item.quantity; i++) {
-                        const productId = item.price.product;
-                        const plansFDB = await query('SELECT * FROM plan where stripe_product_id = ?', [productId])
-                        const plan = plansFDB[0]
+                        const metadata = item.metadata;
+                        console.log(4)
+                        const plan = metadata
                         const node: Pterodactyl.Node = await pteroClient.getNode(String((await findAvailableNode(pteroClient, plan.memory))[0]))
                             .catch(e => {
                             response.status(200).json({status: 'canceled'});
@@ -131,10 +137,10 @@ export async function handleWebhook(request, response) {
                         // Create a new server using Pterodactyl API
                         const availableAllocations = (await node.getAllocations())
                             .filter(allocation => allocation.assigned === false)
-                            .slice(0, plan.allocations + 1);
+                            .slice(0, Number(plan.allocations) + 1);
 
                         const defaultAllocation = availableAllocations[0];
-                        const additionalAllocations = availableAllocations.slice(1, plan.allocations + 1)
+                        const additionalAllocations = availableAllocations.slice(1, Number(plan.allocations) + 1)
                             .map(allocation => allocation.id);
 
                         const newServer = await pteroClient.createServer({
@@ -148,16 +154,17 @@ export async function handleWebhook(request, response) {
                                 "SERVER_JARFILE": "server.jar"
                             },
                             limits: {
-                                memory: plan.memory,
-                                swap: plan.swap,
-                                disk: plan.disk,
-                                io: plan.io,
-                                cpu: plan.cpu
+                                memory: Number(plan.memory),
+                                swap: Number(plan.swap),
+                                disk: Number(plan.disk),
+                                io: Number(plan.io),
+                                cpu: Number(plan.cpu)
                             },
                             featureLimits: {
-                                allocations: plan.allocations,
-                                databases: plan.databases,
-                                backups: plan.backups
+                                allocations: Number(plan.allocations),
+                                databases: Number(plan.databases),
+                                backups: Number(plan.backups),
+                                split_limit: Number(plan.splits)
                             },
                             //@ts-ignore
                             allocation: {
@@ -185,23 +192,6 @@ export async function handleWebhook(request, response) {
                 });
             } catch (e) {
                 console.error(e)
-            }
-
-            break;
-        }
-
-        case 'customer.created': {
-            const subscription = event.data.object as Stripe.Subscription;
-            const customerId = subscription.customer as string;
-            const customer = await stripe.customers.retrieve(customerId);
-
-            const stripeCustomer = await stripeApi.getCustomer(customer.id);
-
-            let customerA = await customerApi.fetchOne(stripeCustomer.id).catch(err => {return null});
-
-            if (!customerA) {
-                // @ts-ignore
-                customerA = await customerApi.createFromStripe(customer).catch(err => {return null})
             }
 
             break;

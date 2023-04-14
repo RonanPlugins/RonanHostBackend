@@ -19,6 +19,7 @@ const stripeApi = new StripeApiClient(process.env.STRIPE_API_KEY)
 export default class UserRepository extends BaseRepository<User> {
     protected stringFields: string[] = ['id', 'email', 'name', 'username', 'pterodactyl_user_id', 'stripe_customer_id'];
 
+    //
     constructor() {
         // @ts-ignore
         super((row: any) => new User(...Object.values(row)));

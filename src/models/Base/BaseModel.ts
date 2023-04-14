@@ -19,4 +19,11 @@ export default class BaseModel<T extends RequiredFields = RequiredFields> {
         }, Promise.resolve({}));
     }
 
+    clone(): BaseModel<T> {
+        return Object.assign(Object.create(Object.getPrototypeOf(this)), JSON.parse(JSON.stringify(this)));
+    }
+
+    toObject(): T {
+        return JSON.parse(JSON.stringify(this)) as T;
+    }
 }

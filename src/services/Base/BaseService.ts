@@ -25,6 +25,35 @@ export default class BaseService<
     async fetchAll(...q:any[]): Promise<K[] | NotFoundError> {
         return await this.repository.fetchAll(...q).catch(e => {throw e});
     }
+    async count(): Promise<number> {
+        return await this.repository.count().catch(e => {throw e});
+    }
+
+    async countBy(column: string, value: any): Promise<number> {
+        return await this.repository.countBy(column, value).catch(e => {throw e});
+    }
+
+    async exists(...q: any[]): Promise<boolean> {
+        return await this.repository.exists(...q).catch(e => {throw e});
+    }
+
+    async existsBy(column: string, value: any): Promise<boolean> {
+        return await this.repository.existsBy(column, value).catch(e => {throw e});
+    }
+
+    async fetchOneBy(column: string, value: any): Promise<K> {
+        return await this.repository.fetchOneBy(column, value).catch(e => {throw e});
+    }
+
+    async fetchRange(offset: number, limit: number): Promise<K[]> {
+        return await this.repository.fetchRange(offset, limit).catch(e => {throw e});
+    }
+    async searchBy(column: string, value: any, options = { caseSensitive: false, wildcards: false }): Promise<K[]> {
+        return await this.repository.searchBy(column, value, options).catch(e => {throw e});
+    }
+    async fetchRangeBy(column: string, value: any, offset: number, limit: number): Promise<K[]> {
+        return await this.repository.fetchRangeBy(column, value, offset, limit).catch(e => {throw e});
+    }
 
     public async update(id: UUID, entity: Partial<K>): Promise<K> {
         const current = await this.repository.fetchOne(id);
@@ -34,6 +63,6 @@ export default class BaseService<
     }
 
     async delete(id: UUID): Promise<void> {
-        await this.repository.delete(id);
+        await this.repository.delete(id).catch(e => {throw e});
     }
 }

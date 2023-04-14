@@ -44,7 +44,7 @@ router.post('/create', checkLoggedIn, async function (req:any, res:any, next:any
     }
 
     const featureLimits: Pterodactyl.ServerFeatureLimits = {
-        allocations: 0, databases: databases, backups: backups
+        allocations: 0, databases: databases, backups: backups, split_limit: 0
     }
 
     const customerObj = <User>await userApi.fetchOne(req?.user?.id).catch(e => {return req.status(500).send({err: e})});

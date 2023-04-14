@@ -1,6 +1,6 @@
 {
   "name": "RonanHost-Backend",
-  "version": "1.3.7",
+  "version": "1.4.1",
   "type": "module",
   "files": [
     "dist"
@@ -11,7 +11,7 @@
     "dev": "node -r tsconfig-paths/register dist/src/app.js"
   },
   "dependencies": {
-    "@avionrx/pterodactyl-js": "^2.1.2",
+    "@avionrx/pterodactyl-js": "^2.1.5",
     "@types/axios": "^0.14.0",
     "@types/dotenv": "^8.2.0",
     "@types/stripe": "^8.0.417",

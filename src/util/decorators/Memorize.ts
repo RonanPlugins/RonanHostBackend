@@ -6,7 +6,7 @@ export default function Memorize() {
     }
 }
 
-export function memoizeAsync(fn: (...args: any[]) => Promise<any>): (...args: any[]) => Promise<any> {
+function memoizeAsync(fn: (...args: any[]) => Promise<any>): (...args: any[]) => Promise<any> {
     const cache = new WeakMap();
     return async function (...args) {
         const key = JSON.stringify(args);
@@ -23,15 +23,6 @@ export function memoizeAsync(fn: (...args: any[]) => Promise<any>): (...args: an
         return result;
     };
 }
-export function updateCache(fn: (...args: any[]) => Promise<any>, args: any[], result: any) {
-    const key = JSON.stringify(args);
-    // @ts-ignore
-    const cache = fn.cache as Map<string, any>;
-    if (cache.has(key)) {
-        cache.delete(key);
-    }
-    cache.set(key, result);
-}
 export function ResetCache() {
     return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
         const originalMethod = descriptor.value;
@@ -44,6 +35,20 @@ export function ResetCache() {
         return descriptor;
     };
 }
+
+export function UpdateCacheOnUpdate() {
+    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+        const originalMethod = descriptor.value;
+        descriptor.value = async function (...args) {
+            const result = await originalMethod.apply(this, args);
+            // Update the cache for the fetchOne method
+            await this.fetchOne.updateCache(args[0]);
+            return result;
+        };
+        return descriptor;
+    };
+}
+
 
 export function UpdateCache() {
     return function(target: any, propertyKey: string, descriptor: PropertyDescriptor) {

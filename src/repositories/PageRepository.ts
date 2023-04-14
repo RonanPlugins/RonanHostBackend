@@ -1,6 +1,6 @@
 import BaseRepository from "./Base/BaseRepository.js";
 import Page from "../models/Page.js";
-import Memorize, {ResetCache} from "../util/decorators/Memorize.js";
+import Memorize, {ResetCache, UpdateCache, UpdateCacheOnUpdate} from "../util/decorators/Memorize.js";
 import {v4} from "../util/functions/UUID.js";
 
 export default class PageRepository extends BaseRepository<Page> {
@@ -18,13 +18,12 @@ export default class PageRepository extends BaseRepository<Page> {
         return super.fetchAll(...q);
     }
 
-    @ResetCache()
-    async update(id: string, data: Partial<Page>): Promise<Page> {
-        return super.update(id, data);
-    }
-
     @Memorize()
     async fetchOne(...q): Promise<Page> {
         return super.fetchOne(...q);
+    }
+    @UpdateCacheOnUpdate()
+    async update(id: string, data: Partial<Page>): Promise<Page> {
+        return super.update(id, data);
     }
 }

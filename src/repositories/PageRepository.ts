@@ -1,7 +1,8 @@
 import BaseRepository from "./Base/BaseRepository.js";
 import Page from "../models/Page.js";
-import {Memorize, ResetCache, UpdateCacheOnUpdate} from "../util/decorators/Memorize.js";
-import {v4} from "../util/functions/UUID.js";
+import {Memorize, UpdateCacheOnUpdate} from "../util/decorators/Memorize.js";
+import {RequiresPermission} from "../util/decorators/Permission";
+import {Permissions} from "../enum/Permissions";
 
 export default class PageRepository extends BaseRepository<Page> {
     protected stringFields: string[] = ['id', 'name'];
@@ -28,6 +29,7 @@ export default class PageRepository extends BaseRepository<Page> {
         return super.fetchOne(...q);
     }
     @UpdateCacheOnUpdate()
+    @RequiresPermission(Permissions.PAGE_MODIFY)
     async update(id: string, data: Partial<Page>): Promise<Page> {
         return super.update(id, data);
     }

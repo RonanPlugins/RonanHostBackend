@@ -24,9 +24,8 @@ export default class Banner extends BaseModel<BannerRequiredFields> {
     public allow_close: boolean;
 
 
-    constructor(id, required: BannerRequiredFields, minutes_between_popup: number, click_url: string, text: string, enabled: boolean, allow_close: boolean) {
+    constructor(id, minutes_between_popup: number, click_url: string, text: string, enabled: boolean, allow_close: boolean) {
         super(id);
-        this.required = required;
         this.minutes_between_popup = minutes_between_popup;
         this.click_url = click_url;
         this.text = text;

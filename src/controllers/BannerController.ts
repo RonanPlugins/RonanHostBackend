@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.get("/", async function (req, res, next) {
     try {
-        const banners = <Banner[]>await bannerService.fetchAllBy("enabled",1).catch(e => { throw e })
+        const banners = <Banner[]>await bannerService.fetchAllBy("enabled",true).catch(e => { throw e })
         return res.status(200).json(await Promise.all(banners.map(async banner=> await banner.toJSON())));
     } catch (e) {
         console.log(e);

@@ -4,6 +4,7 @@ import dotenv from "dotenv"
 import BaseModel, {RequiredFields} from "./Base/BaseModel.js";
 import {AutoAccessor} from "../util/decorators/AutoAccessor.js";
 import type {Hashed} from '../@types/crypto';
+import {getGrantedPermissions, Permissions} from "../enum/Permissions.js";
 
 dotenv.config()
 
@@ -36,7 +37,7 @@ export default class User extends BaseModel<UserRequiredFields> {
     @AutoAccessor()
     public password: Hashed<string>|String;
     @AutoAccessor()
-    public permissions: number;
+    public permissions_integer: number;
 
     constructor(id: UUID, email: string, name: string, username: string, pterodactyl_user_id: number, stripe_customer_id: string,
                 password: Hashed<string>|string, permissions: number) {
@@ -47,7 +48,7 @@ export default class User extends BaseModel<UserRequiredFields> {
         this.pterodactyl_user_id = pterodactyl_user_id;
         this.stripe_customer_id = stripe_customer_id;
         this.password = password;
-        this.permissions = permissions;
+        this.permissions_integer = permissions;
     }
 
     protected async loadPterodactylUser(): Promise<void> {
@@ -63,6 +64,11 @@ export default class User extends BaseModel<UserRequiredFields> {
     async loadStripeCustomer(): Promise<void> {
         // const response = await axios.get(`/api/customers/${this._stripe_customer_id}`);
         this._stripe_customer = null;
+    }
+
+    @AutoAccessor()
+    get permissions(): Permissions[] {
+        return getGrantedPermissions(this.permissions_integer)
     }
 
     @AutoAccessor()

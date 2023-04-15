@@ -21,7 +21,24 @@ const userService = new UserService(new UserRepository())
 function checkLoggedIn(req, res, next) {
     if (req?.user) next(); else return res.status(403).json({ error: true, message: randomResponse().message });
 }
-
+function requiresPermission(requiredPermission: Permissions) {
+    return async function (req, res, next) {
+        const user:User = await userService.fetchOne(req?.user?.id).catch(e => {return undefined});
+        if (user) {
+            const grantedPermissions: Permissions[] = getGrantedPermissions(user.permissions_integer);
+            if (grantedPermissions.includes(requiredPermission)) {
+                next();
+            } else {
+                return res.status(403).json({
+                    error: true,
+                    message: `Permission ${Permissions[requiredPermission]} is required.`
+                });
+            }
+        } else {
+            return res.status(401).json({error: true, message: 'You must be logged in to access this resource.'});
+        }
+    };
+}
 
 router.post('/create', async (req, res) => {
     // @ts-ignore
@@ -31,7 +48,7 @@ router.post('/create', async (req, res) => {
         res.status(500).send(e)
     })
 
-    if (getGrantedPermissions(user.permissions).includes(Permissions.PAGE_ADD)) {
+    if (getGrantedPermissions(user.permissions_integer).includes(Permissions.PAGE_ADD)) {
         const missingValues = ['content', 'name'].filter(key => !req.body[key]);
         if (missingValues.length > 1) return res.status(new MissingValuesError(missingValues).statusCode).send({ error: new MissingValuesError(missingValues) })
         const ins = await pageService.insert({
@@ -84,7 +101,7 @@ router.put('/:page/edit', checkLoggedIn, async (req, res) => {
         res.status(500).send(e)
     })
 
-    if (getGrantedPermissions(user.permissions).includes(Permissions.PAGE_ADD)) {
+    if (getGrantedPermissions(user.permissions_integer).includes(Permissions.PAGE_ADD)) {
         const missingValues = ['content', 'name'].filter(key => !req.body[key]);
         if (missingValues.length >= 1) return res.status(new MissingValuesError(missingValues).statusCode).send({ error: new MissingValuesError(missingValues) })
         const org = <Page>await pageService.fetchOne(req.body.name);

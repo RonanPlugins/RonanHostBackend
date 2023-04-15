@@ -1,6 +1,6 @@
 import BaseRepository from "./Base/BaseRepository.js";
 import Banner from "../models/Banner.js";
-import {Memorize, ResetCache} from "../util/decorators/Memorize.js";
+import {Memorize, ResetCache, UpdateCacheOnUpdate} from "../util/decorators/Memorize.js";
 
 export default class BannerRepository extends BaseRepository<Banner> {
     protected stringFields: string[] = ['id', 'click_url', 'text', 'enabled', 'allow_close', 'minutes_between_popup'];
@@ -27,7 +27,7 @@ export default class BannerRepository extends BaseRepository<Banner> {
         return super.fetchAll(...q);
     }
 
-    @ResetCache()
+    @UpdateCacheOnUpdate()
     async update(id: string, data: Partial<Banner>): Promise<Banner> {
         return super.update(id, data);
     }

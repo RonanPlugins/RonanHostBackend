@@ -157,6 +157,7 @@ export async function handleWebhook(request, response) {
                         console.log(plan)
                         const node: Pterodactyl.Node = await pteroClient.getNode(String((await findAvailableNode(pteroClient, plan.memory))[0]))
                             .catch(e => {
+                                console.error(e)
                             return undefined;
                         })
                         console.log(node)

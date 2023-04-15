@@ -149,7 +149,9 @@ export async function handleWebhook(request, response) {
                 // Loop through subscription items and create a server for each
                 for (const item of subscription.items.data) {
                     for (let i = 0; i < item.quantity; i++) {
-                        const metadata = item.metadata;
+                        // @ts-ignore
+                        const prodct = await stripe.products.retrieve(item.plan.product)
+                        const metadata = prodct.metadata;
                         console.log(4)
                         const plan = metadata
                         console.log(plan)
@@ -157,6 +159,7 @@ export async function handleWebhook(request, response) {
                             .catch(e => {
                             return undefined;
                         })
+                        console.log(node)
                         if (!node) return response.status(500).json({status: 'canceled'});
                         // Create a new server using Pterodactyl API
                         const availableAllocations = (await node.getAllocations())

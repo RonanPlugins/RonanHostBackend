@@ -57,4 +57,3 @@ router.get("/all", checkLoggedInAndHasPermission(Permissions.STATS_READ), async 
     res.send({ users,plans,servers:servers.length,nodes:nodes,locations:locations.length });
 });
 export default router;
-console.log(await pteroClient.getNode(String((await findAvailableNode(pteroClient, 800))[0])))

@@ -15,16 +15,20 @@ function checkLoggedIn(req:any, res:any, next:any) {
     if (req?.user) next(); else return res.status(403).json({ error: true, message: randomResponse().message});
 }
 
-router.get('/', async (req:any, res:any) => {
+router.get('/',checkLoggedIn, async (req:any, res:any) => {
     if (req?.user) return res.status(200).json(req?.user);
     const {query} = req.query;
     const missingValues = ['query'].filter(key => !req.params[key]);
     if (missingValues.length > 1) {
         const MVE = new MissingValuesError(missingValues);
-        res.status(MVE.statusCode).body({error: MVE})
+        res.status(MVE.statusCode).body({ error: MVE })
+        return
     }
     try {
-        const user: User = await userService.fetchOne(query).catch(e => {return res.send(e)});
+        const user: User = await userService.fetchOne(query).catch(e => { return res.send(e) });
+        if (!user) {
+            return res.status(403);
+        }
         return res.status(200).json(await user.toJSON(["password"]))
     } catch (error) {
         console.error(error)

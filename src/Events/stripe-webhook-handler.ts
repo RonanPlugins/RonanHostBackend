@@ -102,6 +102,30 @@ export async function handleWebhook(request, response) {
                 console.log(serverFiltered)
                 for (const server of serverFiltered) {
                     const serFu = await pteroClient.getServer(String(server.id))
+                    await serFu.delete().catch(e => {
+                        console.log(e)
+                    })
+                }
+            } catch (e) {console.error(e)}
+            break;
+        }
+        case 'invoice.payment_failed': {
+            try {
+                const subscription = event.data.object as Stripe.Subscription;
+                const customerId = subscription.customer as string;
+                const customer = await stripe.customers.retrieve(customerId);
+
+                // Get the customer's information from your database using their Stripe customer ID
+                const stripeCustomer = await stripeApi.getCustomer(customer.id);
+                const customerObj = await customerApi.fetchOne(customer.id);
+                const pteroUser = await pteroClient.getUser(String(customerObj.pterodactyl_user_id));
+
+                const servers = (await pteroClient.getServers()).filter(server => server.user === pteroUser.id);
+
+                const serverFiltered = servers.filter(server => JSON.parse(subscription.metadata.servers).includes(server.id));
+                console.log(serverFiltered)
+                for (const server of serverFiltered) {
+                    const serFu = await pteroClient.getServer(String(server.id))
                     await serFu.suspend().catch(e => {
                         console.log(e)
                     })

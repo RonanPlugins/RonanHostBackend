@@ -16,7 +16,7 @@ export async function findAvailableNode(client, memoryNeeded): Promise<number[] 
 
         return availableNodes;
     } catch (error) {
-        console.error(error);
+        console.error("fan",error);
         return null;
     }
 }

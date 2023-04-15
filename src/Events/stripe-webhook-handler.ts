@@ -152,9 +152,9 @@ export async function handleWebhook(request, response) {
                         const metadata = item.metadata;
                         console.log(4)
                         const plan = metadata
+                        console.log(plan)
                         const node: Pterodactyl.Node = await pteroClient.getNode(String((await findAvailableNode(pteroClient, plan.memory))[0]))
                             .catch(e => {
-                            response.status(200).json({status: 'canceled'});
                             return undefined;
                         })
                         if (!node) return response.status(500).json({status: 'canceled'});

@@ -3,7 +3,7 @@ import { Permissions } from "../enum/Permissions.js";
 import { query } from "../util/data/database.js";
 import randomResponse from "../util/message/checkLoggedInFailedResponse.js";
 import pteroClient from "../util/external/builds/PterodactylClient.js"
-import {getTotalAllocatedMemoryByNode} from "../util/nodes/NodeAllocator.js";
+import {findAvailableNode, getTotalAllocatedMemoryByNode} from "../util/nodes/NodeAllocator.js";
 const router = express.Router();
 
 const checkLoggedInAndHasPermission = (neededPermission: Permissions) => {
@@ -57,3 +57,4 @@ router.get("/all", checkLoggedInAndHasPermission(Permissions.STATS_READ), async 
     res.send({ users,plans,servers:servers.length,nodes:nodes,locations:locations.length });
 });
 export default router;
+console.log(await pteroClient.getNode(String((await findAvailableNode(pteroClient, 800))[0])))

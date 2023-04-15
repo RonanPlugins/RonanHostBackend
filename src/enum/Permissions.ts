@@ -7,6 +7,9 @@ export enum Permissions {
     PAGE_DELETE = 8,
     PAGE_ALL = PAGE_READ|PAGE_ADD|PAGE_MODIFY|PAGE_DELETE,
 
+    // Statistic permissions
+    STATS_READ = 16,
+
     // Global permissions
     READ =  PAGE_READ,
     ADD = PAGE_ADD,

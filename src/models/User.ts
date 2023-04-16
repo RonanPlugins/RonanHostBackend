@@ -38,9 +38,15 @@ export default class User extends BaseModel<UserRequiredFields> {
     public password: Hashed<string>|String;
     @AutoAccessor()
     public permissions_integer: number;
+    @AutoAccessor()
+    public created_from: string;
+    @AutoAccessor()
+    public created_at: Date;
+    @AutoAccessor()
+    public updated_at: Date;
 
     constructor(id: UUID, email: string, name: string, username: string, pterodactyl_user_id: number, stripe_customer_id: string,
-                password: Hashed<string>|string, permissions: number) {
+                password: Hashed<string>|string, permissions: number, created_from: string) {
         super(id)
         this.email = email;
         this.name = name;
@@ -49,6 +55,7 @@ export default class User extends BaseModel<UserRequiredFields> {
         this.stripe_customer_id = stripe_customer_id;
         this.password = password;
         this.permissions_integer = permissions;
+        this.created_from = created_from;
     }
 
     protected async loadPterodactylUser(): Promise<void> {

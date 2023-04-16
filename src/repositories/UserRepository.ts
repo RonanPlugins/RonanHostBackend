@@ -40,8 +40,21 @@ export default class UserRepository extends BaseRepository<User> {
 
         const res:User = await this.insert(data).catch(e => {throw e})
         const stripeUser = await stripeApi.createCustomer(
-            new User(res.id, data.email, data.name, data.username, pteroUser.id, String(pteroUser.id), undefined, undefined))
-        return await this.update(res.id, {stripe_customer_id: stripeUser.id, pterodactyl_user_id: pteroUser.id})
+            new User(res.id, data.email, data.name, data.username,
+                pteroUser.id, String(pteroUser.id), undefined, undefined, "Website"))
+        return await this.update(res.id, {stripe_customer_id: stripeUser.id, pterodactyl_user_id: pteroUser.id, created_from: "Website"})
+    }
+
+    async createFromStripeCallback(data: User["required"], stripe_customer_id): Promise<User> {
+        const firstName = data.name.split(' ')[0]
+        const lastName = data.name.split(' ')[1]
+
+        const pteroUser = await pteroClient.createUser({
+            email: data.email, firstName: firstName, lastName: lastName, username: firstName+lastName
+        }).catch(err => {throw new Error("Username or email is already taken")})
+
+        const res:User = await this.insert(data).catch(e => {throw e})
+        return await this.update(res.id, {stripe_customer_id: stripe_customer_id, pterodactyl_user_id: pteroUser.id, created_from: "stripe"})
     }
     tableName()  {
         return 'user';

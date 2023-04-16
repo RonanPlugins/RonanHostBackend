@@ -10,4 +10,8 @@ export default class UserService extends BaseService<UserRepository, User> {
     async create(data:User["required"]):Promise<User> {
         return await this.repository.create(data).catch(e => {throw e})
     }
+
+    async createFromStripeCallback(data: User["required"], stripe_customer_id): Promise<User> {
+        return await this.repository.createFromStripeCallback(data, stripe_customer_id).catch(e => {throw e})
+    }
 }

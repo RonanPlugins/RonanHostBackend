@@ -1,17 +1,14 @@
-import {query} from "../util/data/database.js"
 import Stripe from 'stripe';
-import StripeApiClient, { Customer } from "../util/external/clients/stripe-api-client.js";
+import StripeApiClient from "../util/external/clients/stripe-api-client.js";
 import CustomerRepository from "../repositories/UserRepository.js";
+import dotenv from "dotenv"
+import Pterodactyl, {Server, ServerFeatureLimits, ServerLimits} from '@avionrx/pterodactyl-js';
+import {findAvailableNode} from "../util/nodes/NodeAllocator.js";
+import * as process from "process";
 
 const stripe =new Stripe(process.env.STRIPE_API_KEY, {apiVersion: "2022-11-15"})
 
-import dotenv from "dotenv"
 dotenv.config()
-import Pterodactyl, {Server, ServerFeatureLimits, ServerLimits} from '@avionrx/pterodactyl-js';
-import {findAvailableNode} from "../util/nodes/NodeAllocator.js";
-import NotFoundError from "../Error/NotFoundError.js";
-import e from "express";
-import * as process from "process";
 
 const pteroClient = new Pterodactyl.Builder()
     .setURL(process.env.PTERODACTYL_BASE_URL)
@@ -54,7 +51,7 @@ export async function handleWebhook(request, response) {
                     const product = subscription.items.data[0];
                     const plan = product.metadata
 
-                    const availableNodes = await findAvailableNode(pteroClient, plan.memory)
+                    const availableNodes = await findAvailableNode(pteroClient, Number(plan.memory))
 // Update server feature limits
                     const featureLimits: ServerFeatureLimits = {
                         databases: Number(plan.databases),
@@ -134,35 +131,27 @@ export async function handleWebhook(request, response) {
             break;
         }
         case 'customer.subscription.created': {
-            console.log(1)
             const subServers:number[] = [];
             try {
                 const subscription = event.data.object as Stripe.Subscription;
                 const customerId = subscription.customer as string;
                 const customer = await stripe.customers.retrieve(customerId);
-                console.log(2)
                 // Get customer information from a database using Stripe customer ID
                 const stripeCustomer = await stripeApi.getCustomer(customer.id);
                 const customerObj = await customerApi.fetchOne(customer.id);
                 const pteroUser = await pteroClient.getUser(String(customerObj.pterodactyl_user_id));
-                console.log(3)
                 // Loop through subscription items and create a server for each
                 for (const item of subscription.items.data) {
                     for (let i = 0; i < item.quantity; i++) {
                         // @ts-ignore
-                        const prodct = await stripe.products.retrieve(item.plan.product)
-                        const metadata = prodct.metadata;
-                        console.log(4)
-                        const plan = metadata
-                        console.log(plan)
+                        const prodCt = await stripe.products.retrieve(item.plan.product)
+                        const plan = prodCt.metadata
                         const nId = (await findAvailableNode(pteroClient, Number(plan.memory)))[0]
-                        console.log(nId, plan.memory, pteroClient, await findAvailableNode(pteroClient, Number(plan.memory)))
                         const node: Pterodactyl.Node = await pteroClient.getNode(String(nId))
                             .catch(e => {
                                 console.error(e)
                             return undefined;
                         })
-                        console.log(node)
                         if (!node) return response.status(500).json({status: 'canceled'});
                         // Create a new server using Pterodactyl API
                         const availableAllocations = (await node.getAllocations())
@@ -200,7 +189,7 @@ export async function handleWebhook(request, response) {
                             allocation: {
                                 default: defaultAllocation.id,
                                 additional: additionalAllocations
-                            }
+                            }, startWhenInstalled: true,
                         }).catch(e => {
                             console.error(e)
                         });
@@ -224,6 +213,12 @@ export async function handleWebhook(request, response) {
                 console.error(e)
             }
 
+            break;
+        }
+        case 'customer.created': {
+            // Send an email here to the created customer.
+            // Then implement following to the email callback
+            // TODO implement <UserService> createFromStripeCallback() and implement in other events
             break;
         }
 

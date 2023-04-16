@@ -58,14 +58,10 @@ router.post('/create', async function (req:any, res:any) {
     if (user) return res.status(200).json(await user.toJSON(["password"]));
 })
 
-
-/////////////////////////////////////////
-// Protected from non-logged-in users. //
-/////////////////////////////////////////
-export async function logout(request, response, next) {
-    checkLoggedIn(request, response, () => {
-        request.logOut(error => error ? next(error) : response.sendStatus(200));
-    });
-}
+router.post('/logout', function(req:any, res:any, next:any){
+  req.session.destroy(function (err) {
+    res.sendStatus(200);
+  });
+});
 
 export default router;

@@ -51,7 +51,7 @@ router.get("/all", checkLoggedInAndHasPermission(Permissions.STATS_READ), async 
     const users = (await getTableStatus('user')).total;
     const plans = (await getTableStatus('plan')).total;
     const servers = await pteroClient.getServers()
-    const nodes = await pteroClient.getNodes()
+     const nodes = await getTotalAllocatedMemoryByNode(pteroClient)
     const locations = await pteroClient.getLocations()
     
     res.send({ users,plans,servers:servers.length,nodes:nodes,locations:locations.length });

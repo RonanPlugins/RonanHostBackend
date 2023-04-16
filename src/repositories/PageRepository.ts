@@ -3,7 +3,7 @@ import Page from "../models/Page.js";
 import {Memorize, UpdateCacheOnUpdate} from "../util/decorators/Memorize.js";
 
 export default class PageRepository extends BaseRepository<Page> {
-    protected stringFields: string[] = ['id', 'name'];
+    protected stringFields: string[] = ['id', 'name','title'];
 
     constructor() {
         // @ts-ignore

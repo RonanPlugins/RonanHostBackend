@@ -6,6 +6,7 @@ import {Memorize} from "../util/decorators/Memorize.js";
 export interface PageRequiredFields extends RequiredFields {
     name: string;
     content: string;
+    title: string;
 }
 export default class Page extends BaseModel<PageRequiredFields> {
     required: PageRequiredFields;
@@ -14,11 +15,15 @@ export default class Page extends BaseModel<PageRequiredFields> {
     public name: string;
     @AutoAccessor()
     public content: string
+    @AutoAccessor()
+    public title: string
 
-    constructor(id: UUID, name: string, content: string) {
+    constructor(id: UUID, name: string, content: string,title: string) {
         super(id)
         this.name = name;
         this.content = content;
+        this.title = title;
+
     }
 
     @Memorize()

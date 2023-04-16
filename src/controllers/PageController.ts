@@ -49,10 +49,10 @@ router.post('/create', async (req, res) => {
     })
 
     if (getGrantedPermissions(user.permissions_integer).includes(Permissions.PAGE_ADD)) {
-        const missingValues = ['content', 'name'].filter(key => !req.body[key]);
+        const missingValues = ['content', 'name','title'].filter(key => !req.body[key]);
         if (missingValues.length > 1) return res.status(new MissingValuesError(missingValues).statusCode).send({ error: new MissingValuesError(missingValues) })
         const ins = await pageService.insert({
-            content: req.body.content, id: v4(), name: req.body.name
+            content: req.body.content, id: v4(), name: req.body.name, title: req.body.title
         }).catch(e => {return undefined})
         if (!ins) res.status(500).send("internal error");
         return res.status(200).send(await ins.toJSON());

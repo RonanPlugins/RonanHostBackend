@@ -155,8 +155,8 @@ export async function handleWebhook(request, response) {
                         console.log(4)
                         const plan = metadata
                         console.log(plan)
-                        const nId = (await findAvailableNode(pteroClient, plan.memory))[0]
-                        console.log(nId, plan.memory, pteroClient, await findAvailableNode(pteroClient, 8096))
+                        const nId = (await findAvailableNode(pteroClient, Number(plan.memory)))[0]
+                        console.log(nId, plan.memory, pteroClient, await findAvailableNode(pteroClient, Number(plan.memory)))
                         const node: Pterodactyl.Node = await pteroClient.getNode(String(nId))
                             .catch(e => {
                                 console.error(e)

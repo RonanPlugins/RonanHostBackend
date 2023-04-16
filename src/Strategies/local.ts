@@ -26,7 +26,6 @@ passport.deserializeUser(async function (user: any, cb: any) {
 export const strategy = new Strategy(
     { usernameField: 'emailOrUsername' },
     async function (email: string, password: string, done: any) {
-        console.log(email,password)
         const user = await userService.fetchOne(email).catch(error => {
             return done('Invalid username/email or password', null);
         });

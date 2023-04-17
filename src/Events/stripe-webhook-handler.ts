@@ -5,6 +5,9 @@ import dotenv from "dotenv"
 import Pterodactyl, {Server, ServerFeatureLimits, ServerLimits} from '@avionrx/pterodactyl-js';
 import {findAvailableNode} from "../util/nodes/NodeAllocator.js";
 import * as process from "process";
+import buildHTML, {sendDynamic} from "../lib/email/build/buildHTML.js";
+import RegistrationRepository from "../repositories/RegistrationRepository.js";
+import RegistrationService from "../services/RegistrationService.js";
 
 const stripe =new Stripe(process.env.STRIPE_API_KEY, {apiVersion: "2022-11-15"})
 
@@ -16,7 +19,8 @@ const pteroClient = new Pterodactyl.Builder()
     .asAdmin();
 
 const stripeApi = new StripeApiClient(process.env.STRIPE_API_KEY)
-const customerApi = new CustomerRepository()
+const customerApi = new CustomerRepository();
+const registrationApi = new RegistrationService(new RegistrationRepository())
 
 export async function handleWebhook(request, response) {
     const sig = request.headers['stripe-signature'];
@@ -138,70 +142,16 @@ export async function handleWebhook(request, response) {
                 const customer = await stripe.customers.retrieve(customerId);
                 // Get customer information from a database using Stripe customer ID
                 const stripeCustomer = await stripeApi.getCustomer(customer.id);
-                const customerObj = await customerApi.fetchOne(customer.id);
-                const pteroUser = await pteroClient.getUser(String(customerObj.pterodactyl_user_id));
-                // Loop through subscription items and create a server for each
-                for (const item of subscription.items.data) {
-                    for (let i = 0; i < item.quantity; i++) {
-                        // @ts-ignore
-                        const prodCt = await stripe.products.retrieve(item.plan.product)
-                        const plan = prodCt.metadata
-                        const nId = (await findAvailableNode(pteroClient, Number(plan.memory)))[0]
-                        const node: Pterodactyl.Node = await pteroClient.getNode(String(nId))
-                            .catch(e => {
-                                console.error(e)
-                            return undefined;
-                        })
-                        if (!node) return response.status(500).json({status: 'canceled'});
-                        // Create a new server using Pterodactyl API
-                        const availableAllocations = (await node.getAllocations())
-                            .filter(allocation => allocation.assigned === false)
-                            .slice(0, Number(plan.allocations) + 1);
-
-                        const defaultAllocation = availableAllocations[0];
-                        const additionalAllocations = availableAllocations.slice(1, Number(plan.allocations) + 1)
-                            .map(allocation => allocation.id);
-
-                        const newServer = await pteroClient.createServer({
-                            name: String(pteroUser.firstName) + "'s server",
-                            user: pteroUser.id,
-                            egg: 1,
-                            image: "quay.io/pterodactyl/core:java",
-                            startup: "java -Xmx{{SERVER_MEMORY}} -Xms{{SERVER_MEMORY}} -jar {{SERVER_JARFILE}} nogui",
-                            environment: {
-                                "BUNGEE_VERSION": "latest",
-                                "SERVER_JARFILE": "server.jar"
-                            },
-                            limits: {
-                                memory: Number(plan.memory),
-                                swap: Number(plan.swap),
-                                disk: Number(plan.disk),
-                                io: Number(plan.io),
-                                cpu: Number(plan.cpu)
-                            },
-                            featureLimits: {
-                                allocations: Number(plan.allocations),
-                                databases: Number(plan.databases),
-                                backups: Number(plan.backups),
-                                split_limit: Number(plan.splits)
-                            },
-                            //@ts-ignore
-                            allocation: {
-                                default: defaultAllocation.id,
-                                additional: additionalAllocations
-                            }, startWhenInstalled: true,
-                        }).catch(e => {
-                            console.error(e)
-                        });
-
-                        if (newServer instanceof Server) {
-                            subServers.push(newServer.id)
-                            console.log(`New server created with id` + newServer.id);
-                        } else {
-                            console.error("newServer ain't instanceof Server cuz")
-                        }
-                    }
+                let customerObj;
+                try {
+                    customerObj = await customerApi.fetchOne(customer.id);
+                } catch (e) {
+                    return await registrationApi.prepare(subscription.items.data,customerId, stripeCustomer.email, stripeCustomer.name)
                 }
+                const pteroUser = await pteroClient.getUser(String(await customerObj.pterodactyl_user_id));
+                // Loop through subscription items and create a server for each
+                await registerProducts(subscription, pteroUser, response, subServers);
+
                 await stripe.subscriptions.update(subscription.id, {
                     metadata: {
                         servers: JSON.stringify(subServers)
@@ -216,15 +166,76 @@ export async function handleWebhook(request, response) {
             break;
         }
         case 'customer.created': {
-            // Send an email here to the created customer.
-            // Then implement following to the email callback
-            // TODO implement <UserService> createFromStripeCallback() and implement in other events
+
             break;
         }
-
 
         // Handle other event types as necessary
         default:
             console.log(`Unhandled event type: ${event.type}`);
+    }
+}
+
+async function registerProducts(subscription, pteroUser, response, subServers) {
+    for (const item of subscription.items.data) {
+        for (let i = 0; i < item.quantity; i++) {
+            // @ts-ignore
+            const prodCt = await stripe.products.retrieve(item.plan.product)
+            const plan = prodCt.metadata
+            const nId = (await findAvailableNode(pteroClient, Number(plan.memory)))[0]
+            const node: Pterodactyl.Node = await pteroClient.getNode(String(nId))
+                .catch(e => {
+                    console.error(e)
+                    return undefined;
+                })
+            if (!node) return response.status(500).json({status: 'canceled'});
+            // Create a new server using Pterodactyl API
+            const availableAllocations = (await node.getAllocations())
+                .filter(allocation => allocation.assigned === false)
+                .slice(0, Number(plan.allocations) + 1);
+
+            const defaultAllocation = availableAllocations[0];
+            const additionalAllocations = availableAllocations.slice(1, Number(plan.allocations) + 1)
+                .map(allocation => allocation.id);
+
+            const newServer = await pteroClient.createServer({
+                name: String(pteroUser.firstName) + "'s server",
+                user: pteroUser.id,
+                egg: 1,
+                image: "quay.io/pterodactyl/core:java",
+                startup: "java -Xmx{{SERVER_MEMORY}} -Xms{{SERVER_MEMORY}} -jar {{SERVER_JARFILE}} nogui",
+                environment: {
+                    "BUNGEE_VERSION": "latest",
+                    "SERVER_JARFILE": "server.jar"
+                },
+                limits: {
+                    memory: Number(plan.memory),
+                    swap: Number(plan.swap),
+                    disk: Number(plan.disk),
+                    io: Number(plan.io),
+                    cpu: Number(plan.cpu)
+                },
+                featureLimits: {
+                    allocations: Number(plan.allocations),
+                    databases: Number(plan.databases),
+                    backups: Number(plan.backups),
+                    split_limit: Number(plan.splits)
+                },
+                //@ts-ignore
+                allocation: {
+                    default: defaultAllocation.id,
+                    additional: additionalAllocations
+                }, startWhenInstalled: true,
+            }).catch(e => {
+                console.error(e)
+            });
+
+            if (newServer instanceof Server) {
+                subServers.push(newServer.id)
+                console.log(`New server created with id` + newServer.id);
+            } else {
+                console.error("newServer ain't instanceof Server cuz")
+            }
+        }
     }
 }

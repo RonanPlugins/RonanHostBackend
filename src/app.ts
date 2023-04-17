@@ -14,14 +14,7 @@ import userController from "./controllers/UserController.js";
 import pageController from "./controllers/PageController.js";
 import bannerController from "./controllers/BannerController.js";
 import statisticsController from "./controllers/StatisticsController.js";
-// import metricsController from "./metrics/controller/metricsController.js";
-import crypto from "./util/security/crypto.js";
-import {
-    getGrantedPermissions,
-    getGrantedPermissionsNames,
-    getPermissionInteger,
-    Permissions
-} from "./enum/Permissions.js";
+import buildHTML from "./lib/email/build/buildHTML";
 
 dotenv.config();
 const config:AppConfig = configLoader ?? (() =>
@@ -81,7 +74,6 @@ app.use('/user', userController);
 app.use('/page', pageController);
 app.use('/banners', bannerController);
 app.use('/statistics', statisticsController);
-// app.use('/metrics', metricsController)
 
 
 app.get("/", (req:any, res:any) => {
@@ -91,7 +83,6 @@ app.get("/", (req:any, res:any) => {
 app.listen(config.app_port, async () => {
     console.log("Server listening on port "+config.app_port);
 });
-
 process.on('SIGINT', function() {
   console.log( "\nGracefully shutting down from SIGINT (Ctrl-C)" );
   // some other closing procedures go here

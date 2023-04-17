@@ -1,6 +1,6 @@
 {
   "name": "RonanHost-Backend",
-  "version": "1.4.13",
+  "version": "1.4.14",
   "type": "module",
   "files": [
     "dist"
@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@avionrx/pterodactyl-js": "^2.1.5",
+    "@sendgrid/mail": "^7.7.0",
     "@types/axios": "^0.14.0",
     "@types/dotenv": "^8.2.0",
     "@types/stripe": "^8.0.417",

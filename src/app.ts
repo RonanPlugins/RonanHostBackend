@@ -14,6 +14,7 @@ import userController from "./controllers/UserController.js";
 import pageController from "./controllers/PageController.js";
 import bannerController from "./controllers/BannerController.js";
 import statisticsController from "./controllers/StatisticsController.js";
+import registerController from "./controllers/RegistrationController.js";
 import buildHTML from "./lib/email/build/buildHTML";
 
 dotenv.config();
@@ -74,6 +75,7 @@ app.use('/user', userController);
 app.use('/page', pageController);
 app.use('/banners', bannerController);
 app.use('/statistics', statisticsController);
+app.use('/register', registerController);
 
 
 app.get("/", (req:any, res:any) => {

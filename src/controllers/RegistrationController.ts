@@ -1,5 +1,5 @@
 import express from "express";
-import MissingValuesError from "../Error/MissingValuesError";
+import MissingValuesError from "../Error/MissingValuesError.js";
 import User from "../models/User.js";
 import UserRepository from "../repositories/UserRepository.js"
 import UserService from "../services/UserService.js"
@@ -21,13 +21,23 @@ router.post('/', async (req:any, res:any) => {
         res.status(MVE.statusCode).body({ error: MVE })
         return
     }
-
+    // TODO: kris fix 
+    // Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
     try {
         const registration: Registration = await registrationService.fetchOne(token).catch(e => { return res.status(403).send(e) });
-        if (!registration) {return res.status(403);}
+            console.log("here 0")
 
-        await registrationService.finalize(token, username, password, res)
+        if (!registration) {return res.status(204);} // 204 No Content
+            console.log("here 1")
+
+        await registrationService.finalize(token, username, password, res).then((re) => {
+            console.log("here")
+            return res.status(200);
+        })
     } catch (e) {
+            console.log("here lol")
         return res.status(500).send(e)
     }
 })
+
+export default router;

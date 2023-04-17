@@ -150,7 +150,7 @@ export async function handleWebhook(request, response) {
                 }
                 const pteroUser = await pteroClient.getUser(String(await customerObj.pterodactyl_user_id));
                 // Loop through subscription items and create a server for each
-                await registerProducts(subscription, pteroUser, response, subServers);
+                await registerProducts(subscription, pteroUser, response, subServers, stripe, pteroClient);
 
                 await stripe.subscriptions.update(subscription.id, {
                     metadata: {
@@ -172,7 +172,7 @@ export async function handleWebhook(request, response) {
     }
 }
 
-export async function registerProducts(subscription, pteroUser, response, subServers) {
+export async function registerProducts(subscription, pteroUser, response, subServers, stripe, pteroClient) {
     for (const item of subscription.items.data) {
         for (let i = 0; i < item.quantity; i++) {
             // @ts-ignore

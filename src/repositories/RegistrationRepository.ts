@@ -7,7 +7,15 @@ import UserRepository from "./UserRepository.js";
 import {registerProducts} from "../Events/stripe-webhook-handler.js";
 import Stripe from "stripe";
 import dotenv from "dotenv"
+import Pterodactyl from "@avionrx/pterodactyl-js";
+import process from "process";
 dotenv.config()
+
+
+const pteroClient = new Pterodactyl.Builder()
+    .setURL(process.env.PTERODACTYL_BASE_URL)
+    .setAPIKey(process.env.PTERODACTYL_API_KEY)
+    .asAdmin();
 
 const stripe =new Stripe(process.env.STRIPE_API_KEY, {apiVersion: "2022-11-15"})
 
@@ -41,14 +49,16 @@ export default class RegistrationRepository extends BaseRepository<Registration>
     async finalize(token, username, password, response) {
         const reg = await super.fetchOne(token)
         // @ts-ignore
-        const parsedData = JSON.parse(reg.data)
+        const parsedData = (await JSON.parse(reg.data))[0]
         const user = await userService.createFromStripeCallback({
             email: reg.email, name: reg.name, id: v4(), username: username, password: password
         }, reg.stripe_customer_id);
-        console.log(user.pterodactyl_user)
-        const subscription = await stripe.subscriptions.retrieve(parsedData.id)
+        console.log(parsedData.subscription)
+        console.log(await user.pterodactyl_user)
+        const subscription = await stripe.subscriptions.retrieve(await parsedData.subscription)
+        console.log(subscription)
         let subServers = []
-        await registerProducts(subscription, user.pterodactyl_user, response, subServers)
+        await registerProducts(subscription, await user.pterodactyl_user, response, subServers, stripe, pteroClient)
         await stripe.subscriptions.update(subscription.id, {
             metadata: {
                 servers: JSON.stringify(subServers)

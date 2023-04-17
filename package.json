@@ -1,6 +1,6 @@
 {
   "name": "RonanHost-Backend",
-  "version": "1.4.15",
+  "version": "1.4.16",
   "type": "module",
   "files": [
     "dist"

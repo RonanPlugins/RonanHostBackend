@@ -60,6 +60,7 @@ export default class User extends BaseModel<UserRequiredFields> {
 
     protected async loadPterodactylUser(): Promise<void> {
         this._pterodactyl_user = await pteroClient.getUser(String(this.pterodactyl_user_id))
+        return this._pterodactyl_user;
     }
 
     @AutoAccessor()

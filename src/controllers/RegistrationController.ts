@@ -26,8 +26,8 @@ router.post('/', async (req:any, res:any) => {
         const registration: Registration = await registrationService.fetchOne(token).catch(e => { return res.status(403).send(e) });
         if (!registration) {return res.status(403);}
 
-
+        await registrationService.finalize(token, username, password, res)
     } catch (e) {
-
+        return res.status(500).send(e)
     }
 })

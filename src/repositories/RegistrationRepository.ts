@@ -2,6 +2,16 @@ import BaseRepository from "./Base/BaseRepository.js";
 import Registration from "../models/Registration.js";
 import buildHTML, {sendDynamic} from "../lib/email/build/buildHTML.js";
 import {v4} from "../util/functions/UUID.js";
+import UserService from "../services/UserService.js";
+import UserRepository from "./UserRepository.js";
+import {registerProducts} from "../Events/stripe-webhook-handler.js";
+import Stripe from "stripe";
+import dotenv from "dotenv"
+dotenv.config()
+
+const stripe =new Stripe(process.env.STRIPE_API_KEY, {apiVersion: "2022-11-15"})
+
+const userService = new UserService(new UserRepository())
 
 export default class RegistrationRepository extends BaseRepository<Registration> {
     protected stringFields: string[] = ['id', 'stripe_customer_id', 'data'];
@@ -26,6 +36,25 @@ export default class RegistrationRepository extends BaseRepository<Registration>
                 return undefined; })
 
         return registration || undefined;
+    }
+
+    async finalize(token, username, password, response) {
+        const reg = await super.fetchOne(token)
+        // @ts-ignore
+        const parsedData = JSON.parse(reg.data)
+        const user = await userService.createFromStripeCallback({
+            email: reg.email, name: reg.name, id: v4(), username: username, password: password
+        }, reg.stripe_customer_id);
+        console.log(user.pterodactyl_user)
+        const subscription = await stripe.subscriptions.retrieve(parsedData.id)
+        let subServers = []
+        await registerProducts(subscription, user.pterodactyl_user, response, subServers)
+        await stripe.subscriptions.update(subscription.id, {
+            metadata: {
+                servers: JSON.stringify(subServers)
+            }
+        });
+        return response.status(200).send("success", subServers);
     }
 
 }

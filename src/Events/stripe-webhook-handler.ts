@@ -165,10 +165,6 @@ export async function handleWebhook(request, response) {
 
             break;
         }
-        case 'customer.created': {
-
-            break;
-        }
 
         // Handle other event types as necessary
         default:
@@ -176,7 +172,7 @@ export async function handleWebhook(request, response) {
     }
 }
 
-async function registerProducts(subscription, pteroUser, response, subServers) {
+export async function registerProducts(subscription, pteroUser, response, subServers) {
     for (const item of subscription.items.data) {
         for (let i = 0; i < item.quantity; i++) {
             // @ts-ignore

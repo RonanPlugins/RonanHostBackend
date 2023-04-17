@@ -1,0 +1,136 @@
+/* Global styles */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Montserrat', sans-serif;
+    background: url("../../images/b-05-10blur-corners.png");
+    background-size: cover;
+}
+
+/* Email group */
+.email-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0 10px;
+    min-height: 100vh;
+}
+
+/* Frame 23 */
+.frame-23 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 52px 10px 10px;
+    gap: 24px;
+    max-width: 700px;
+    width: 100%;
+    background: #333333;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    flex: none;
+    order: 0;
+    flex-grow: 1;
+}
+
+.rh-logo img {
+    width: 147px;
+    height: 147px;
+}
+.ronan-host {
+    width: 216px;
+    height: 48px;
+    text-align: center;
+
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 48px;
+
+    color: #FFFFFF;
+}
+.best-regards {
+    gap: 50px;
+    margin-top: 50px;
+    text-align: left;
+    width: fit-content;
+    color: #FFFFFF;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    position: absolute;
+    bottom: 75px;
+}
+.texts {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+    gap: 31px;
+}
+.texts * {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 18px;
+
+    margin: 0 25px;
+
+    color: rgba(255, 255, 255, 0.75);
+}
+.register {
+    border-radius: 20px;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    text-decoration: none;
+    margin: 35px 0;
+}
+.register div {
+    width: 200px;
+    height: 40px;
+    left: 131px;
+    top: 140px;
+
+    background: #D8AA4C;
+    border-radius: 50px;
+
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    vertical-align: middle;
+}
+.register div span {
+    height: fit-content;
+    line-height: 35px;
+    vertical-align: middle;
+
+}
+br {
+    margin: 5px 0;
+}
+.dear {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 24px;
+
+    color: rgba(255, 255, 255, 0.75);
+}
+.thank-you {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 18px;
+
+    text-align: center;
+
+    color: rgba(255, 255, 255, 0.75);
+}

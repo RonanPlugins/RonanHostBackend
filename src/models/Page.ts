@@ -23,7 +23,6 @@ export default class Page extends BaseModel<PageRequiredFields> {
         this.name = name;
         this.content = content;
         this.title = title;
-
     }
 
     @Memorize()

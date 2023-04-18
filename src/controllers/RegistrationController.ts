@@ -21,10 +21,12 @@ router.post('/', async (req:any, res:any) => {
         res.status(MVE.statusCode).body({ error: MVE })
         return
     }
-
     try {
+        console.log(1)
         await registrationService.finalize(token, username, password, res)
     } catch (e) {
+        console.log(2)
+        console.error(e)
         return res.status(500).send(e)
     }
 

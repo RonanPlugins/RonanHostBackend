@@ -62,8 +62,9 @@ export default class RegistrationRepository extends BaseRepository<Registration>
                     servers: JSON.stringify(subServers)
                 }
             });
-            return response.status(200).send("success", subServers);
+            return response.status(200).send({success: true, subServers});
         } catch (e) {
+            console.error(e)
             return response.status(500).send(e)
         }
     }

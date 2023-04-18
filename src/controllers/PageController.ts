@@ -48,7 +48,7 @@ router.post('/create', async (req, res) => {
         res.status(500).send(e)
     })
 
-    if (getGrantedPermissions(user.permissions_integer).includes(Permissions.PAGE_ADD)) {
+    if (getGrantedPermissions(user.permissions_integer).includes(Permissions.PAGE_ADD || -1)) {
         const missingValues = ['content', 'name','title'].filter(key => !req.body[key]);
         if (missingValues.length > 1) return res.status(new MissingValuesError(missingValues).statusCode).send({ error: new MissingValuesError(missingValues) })
         const ins = await pageService.insert({
@@ -67,8 +67,7 @@ router.delete('/:page/delete', async (req, res) => {
 
     if (!page) return res.status(401).send(new NotFoundError("page", req.params.page));
     if (!user) return res.status(401).send(new NotFoundError("user", session_user_id));
-
-    if (!getGrantedPermissions(user.permissions).includes(Permissions.PAGE_DELETE)) return res.status(500).send("Unauthorized");
+    if (!getGrantedPermissions(user.permissions_integer).includes(Permissions.PAGE_DELETE || -1)) return res.status(500).send("Unauthorized");
 
     try {
         await pageService.delete(page.id)
@@ -100,17 +99,19 @@ router.put('/:page/edit', checkLoggedIn, async (req, res) => {
     const user: User = <User>await userService.fetchOne(session_user_id).catch(e => {
         res.status(500).send(e)
     })
-
-    if (getGrantedPermissions(user.permissions_integer).includes(Permissions.PAGE_ADD)) {
-        const missingValues = ['content', 'name'].filter(key => !req.body[key]);
+    if (getGrantedPermissions(user.permissions_integer).includes(Permissions.PAGE_ADD || -1)) {
+        const missingValues = ['content', 'name','title'].filter(key => !req.body[key]);
         if (missingValues.length >= 1) return res.status(new MissingValuesError(missingValues).statusCode).send({ error: new MissingValuesError(missingValues) })
         const org = <Page>await pageService.fetchOne(req.body.name);
         const ins = <Page>await pageService.update(org.id, {
+            name: req.body.name,
+            title: req.body.title,
             content: req.body.content
         }).catch(e => {
             return res.status(500).send(e)
         })
-        res.status(200).send(await ins.toJSON())
+        const pages = <Page[]>await pageService.fetchAll().catch(e => { throw e })
+        return res.status(200).json(await Promise.all(pages.map(async page => await page.toJSON())));
     } else return res.status(500).send("Unauthorized")
 })
 router.get('/', async (req: any, res: any) => {

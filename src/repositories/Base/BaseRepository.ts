@@ -162,6 +162,7 @@ export default class BaseRepository<T extends {required: Record<string, any>}> {
      * @throws {DuplicateError} - If the object being updated violates a unique constraint in the database
      */
     async update(id: string, data: Partial<T>): Promise<T> {
+        delete data.required
         const keys = Object.keys(data).map(key => `${key} = ?`).join(', ');
         const values = Object.values(data);
         await query(`UPDATE ${this.tableName()} SET ${keys} WHERE id = ?`, [...values, id]).catch(e => {

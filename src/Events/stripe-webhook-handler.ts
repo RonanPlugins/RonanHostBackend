@@ -206,7 +206,7 @@ export async function registerProducts(subscription, pteroUser, response, subSer
                 user: pteroUser.id,
                 egg: 1,
                 image: "quay.io/pterodactyl/core:java",
-                startup: "java -Xmx{{SERVER_MEMORY}} -Xms{{SERVER_MEMORY}} -jar {{SERVER_JARFILE}} nogui",
+                startup: "java -Xmx{{SERVER_MEMORY}}M -Xms{{SERVER_MEMORY}}M -jar {{SERVER_JARFILE}} nogui",
                 environment: {
                     "BUNGEE_VERSION": "latest",
                     "SERVER_JARFILE": "server.jar"

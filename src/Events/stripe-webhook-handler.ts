@@ -171,6 +171,7 @@ export async function handleWebhook(request, response) {
 
         // Handle other event types as necessary
         default:
+            response.status(202).send({})
             console.log(`Unhandled event type: ${event.type}`);
     }
 }

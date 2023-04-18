@@ -103,7 +103,7 @@ export async function handleWebhook(request, response) {
                 console.log(serverFiltered)
                 for (const server of serverFiltered) {
                     const serFu = await pteroClient.getServer(String(server.id))
-                    await serFu.delete().catch(e => {
+                    await serFu.suspend().catch(e => {
                         console.log(e)
                     })
                 }

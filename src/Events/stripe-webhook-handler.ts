@@ -162,11 +162,10 @@ export async function handleWebhook(request, response) {
                 }).catch(e => {
                     console.error(e);
                 });
-                return response.status(200).send(subServers)
             } catch (e) {
                 console.error(e)
             }
-
+            response.status(200).send(subServers)
             break;
         }
 

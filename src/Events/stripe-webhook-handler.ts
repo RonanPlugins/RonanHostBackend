@@ -146,10 +146,13 @@ export async function handleWebhook(request, response) {
                 try {
                     customerObj = await customerApi.fetchOne(customer.id);
                 } catch (e) {
+                    response.status(202)
                     return await registrationApi.prepare(subscription.items.data,customerId, stripeCustomer.email, stripeCustomer.name)
                 }
+                console.log(customerObj)
                 const pteroUser = await pteroClient.getUser(String(await customerObj.pterodactyl_user_id));
                 // Loop through subscription items and create a server for each
+                console.log("1a")
                 await registerProducts(subscription, pteroUser, response, subServers, stripe, pteroClient);
 
                 await stripe.subscriptions.update(subscription.id, {
@@ -175,25 +178,28 @@ export async function handleWebhook(request, response) {
 export async function registerProducts(subscription, pteroUser, response, subServers, stripe, pteroClient) {
     for (const item of subscription.items.data) {
         for (let i = 0; i < item.quantity; i++) {
-            // @ts-ignore
+            console.log(1)
             const prodCt = await stripe.products.retrieve(item.plan.product)
+            console.log(2)
             const plan = prodCt.metadata
             const nId = (await findAvailableNode(pteroClient, Number(plan.memory)))[0]
+            console.log(3)
             const node: Pterodactyl.Node = await pteroClient.getNode(String(nId))
                 .catch(e => {
                     console.error(e)
                     return undefined;
                 })
+            console.log(node)
             if (!node) return response.status(500).json({status: 'canceled'});
-            // Create a new server using Pterodactyl API
+            console.log(4)
             const availableAllocations = (await node.getAllocations())
                 .filter(allocation => allocation.assigned === false)
                 .slice(0, Number(plan.allocations) + 1);
-
+            console.log(5)
             const defaultAllocation = availableAllocations[0];
             const additionalAllocations = availableAllocations.slice(1, Number(plan.allocations) + 1)
                 .map(allocation => allocation.id);
-
+            console.log(6)
             const newServer = await pteroClient.createServer({
                 name: String(pteroUser.firstName) + "'s server",
                 user: pteroUser.id,

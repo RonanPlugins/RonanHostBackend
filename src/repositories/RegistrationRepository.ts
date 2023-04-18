@@ -47,24 +47,25 @@ export default class RegistrationRepository extends BaseRepository<Registration>
     }
 
     async finalize(token, username, password, response) {
-        const reg = await super.fetchOne(token)
-        // @ts-ignore
-        const parsedData = (await JSON.parse(reg.data))[0]
-        const user = await userService.createFromStripeCallback({
-            email: reg.email, name: reg.name, id: v4(), username: username, password: password
-        }, reg.stripe_customer_id);
-        console.log(parsedData.subscription)
-        console.log(await user.pterodactyl_user)
-        const subscription = await stripe.subscriptions.retrieve(await parsedData.subscription)
-        console.log(subscription)
-        let subServers = []
-        await registerProducts(subscription, await user.pterodactyl_user, response, subServers, stripe, pteroClient)
-        await stripe.subscriptions.update(subscription.id, {
-            metadata: {
-                servers: JSON.stringify(subServers)
-            }
-        });
-        return response.status(200).send("success", subServers);
+        try {
+            const reg = await super.fetchOne(token)
+            // @ts-ignore
+            const parsedData = (await JSON.parse(reg.data))[0]
+            const user = await userService.createFromStripeCallback({
+                email: reg.email, name: reg.name, id: v4(), username: username, password: password
+            }, reg.stripe_customer_id);
+            const subscription = await stripe.subscriptions.retrieve(await parsedData.subscription)
+            let subServers = []
+            await registerProducts(subscription, await user.pterodactyl_user, response, subServers, stripe, pteroClient)
+            await stripe.subscriptions.update(subscription.id, {
+                metadata: {
+                    servers: JSON.stringify(subServers)
+                }
+            });
+            return response.status(200).send("success", subServers);
+        } catch (e) {
+            return response.status(500).send(e)
+        }
     }
 
 }

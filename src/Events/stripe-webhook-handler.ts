@@ -146,8 +146,13 @@ export async function handleWebhook(request, response) {
                 try {
                     customerObj = await customerApi.fetchOne(customer.id);
                 } catch (e) {
-                    response.status(202)
-                    return await registrationApi.prepare(subscription.items.data,customerId, stripeCustomer.email, stripeCustomer.name)
+                    try {
+                        customerObj = await customerApi.fetchOne(stripeCustomer.email);
+                        await customerApi.update(customerObj.id, {stripe_customer_id: customer.id})
+                    } catch (e) {
+                        response.status(202)
+                        return await registrationApi.prepare(subscription.items.data,customerId, stripeCustomer.email, stripeCustomer.name)
+                    }
                 }
                 console.log(customerObj)
                 const pteroUser = await pteroClient.getUser(String(await customerObj.pterodactyl_user_id));

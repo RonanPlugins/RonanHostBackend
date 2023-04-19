@@ -9,11 +9,6 @@ import MissingValuesError from "../Error/MissingValuesError.js";
 import {findAvailableNode} from "../util/nodes/NodeAllocator.js";
 import Server from "../models/Server.js";
 
-// const pteroClient = new Pterodactyl.Builder()
-//     .setURL(process.env.PTERODACTYL_BASE_URL)
-//     .setAPIKey(process.env.PTERODACTYL_API_KEY)
-//     .asAdmin();
-
 import pteroClient from "../util/external/builds/PterodactylClient.js"
 import User from "../models/User.js";
 

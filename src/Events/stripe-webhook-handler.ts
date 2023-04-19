@@ -179,12 +179,9 @@ export async function handleWebhook(request, response) {
 export async function registerProducts(subscription, pteroUser, response, subServers, stripe, pteroClient) {
     for (const item of subscription.items.data) {
         for (let i = 0; i < item.quantity; i++) {
-            console.log(1)
             const prodCt = await stripe.products.retrieve(item.plan.product)
-            console.log(2)
             const plan = prodCt.metadata
             const nId = (await findAvailableNode(pteroClient, Number(plan.memory)))[0]
-            console.log(3)
             const node: Pterodactyl.Node = await pteroClient.getNode(String(nId))
                 .catch(e => {
                     console.error(e)
@@ -192,21 +189,18 @@ export async function registerProducts(subscription, pteroUser, response, subSer
                 })
             console.log(node)
             if (!node) return response.status(500).json({status: 'canceled'});
-            console.log(4)
             const availableAllocations = (await node.getAllocations())
                 .filter(allocation => allocation.assigned === false)
                 .slice(0, Number(plan.allocations) + 1);
-            console.log(5)
             const defaultAllocation = availableAllocations[0];
             const additionalAllocations = availableAllocations.slice(1, Number(plan.allocations) + 1)
                 .map(allocation => allocation.id);
-            console.log(6)
             const newServer = await pteroClient.createServer({
                 name: String(pteroUser.firstName) + "'s server",
                 user: pteroUser.id,
-                egg: 1,
+                egg: 5,
                 image: "quay.io/pterodactyl/core:java",
-                startup: "java -Xmx{{SERVER_MEMORY}}M -Xms{{SERVER_MEMORY}}M -jar {{SERVER_JARFILE}} nogui",
+                startup: "java -Xms128M -XX:MaxRAMPercentage=95.0 -jar {{SERVER_JARFILE}}",
                 environment: {
                     "BUNGEE_VERSION": "latest",
                     "SERVER_JARFILE": "server.jar"

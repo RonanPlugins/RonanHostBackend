@@ -208,7 +208,6 @@ export async function registerProducts(subscription, pteroUser, response, subSer
                 name: String(pteroUser.firstName) + "'s server",
                 user: pteroUser.id,
                 egg: 5,
-                image: "quay.io/pterodactyl/core:java",
                 startup: "java -Xms128M -XX:MaxRAMPercentage=95.0 -jar {{SERVER_JARFILE}}",
                 environment: {
                     "BUNGEE_VERSION": "latest",

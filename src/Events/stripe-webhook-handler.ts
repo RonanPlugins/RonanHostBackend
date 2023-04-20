@@ -170,6 +170,10 @@ export async function handleWebhook(request, response) {
             } catch (e) {
                 console.error(e)
             }
+            if (subServers.length === 0) {
+                response.status(500)
+                break;
+            }
             response.status(200).send(subServers)
             break;
         }
@@ -208,6 +212,7 @@ export async function registerProducts(subscription, pteroUser, response, subSer
                 startup: "java -Xms128M -XX:MaxRAMPercentage=95.0 -jar {{SERVER_JARFILE}}",
                 environment: {
                     "BUNGEE_VERSION": "latest",
+                    "BUILD_NUMBER": "latest",
                     "SERVER_JARFILE": "server.jar"
                 },
                 limits: {

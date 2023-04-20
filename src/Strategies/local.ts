@@ -15,7 +15,7 @@ passport.serializeUser(function (user: any, cb: any) {
 
 passport.deserializeUser(async function (user: any, cb: any) {
     process.nextTick(async function () {
-        if (!user) return cb("Unauthorized: localStat")
+        if (!user || !user.email) return cb("Unauthorized: localStat")
         const u = await userService.fetchOne(user.email).catch(error => {
             return cb('Invalid username/email or password', null);
         });

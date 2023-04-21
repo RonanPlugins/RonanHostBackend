@@ -190,7 +190,7 @@ export async function registerProducts(subscription, pteroUser, response, subSer
         for (let i = 0; i < item.quantity; i++) {
             const prodCt = await stripe.products.retrieve(item.plan.product)
             const plan = prodCt.metadata
-            const nId = (await findAvailableNode(pteroClient, Number(plan.memory)))[0]
+            const nId = (await findAvailableNode(pteroClient, Number(plan.memory), JSON.parse(plan.nodes)))[0]
             const node: Pterodactyl.Node = await pteroClient.getNode(String(nId))
                 .catch(e => {
                     console.error(e)

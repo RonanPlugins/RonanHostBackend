@@ -1,9 +1,11 @@
 import {Node, Server} from "@avionrx/pterodactyl-js"
 
-export async function findAvailableNode(client, memoryNeeded): Promise<number[] | null> {
+export async function findAvailableNode(client, memoryNeeded, nodesFilter = null): Promise<number[] | null> {
     const availableNodes = [];
     try {
-        const nodes = await client.getNodes()
+        let nodes = await client.getNodes();
+
+        if (nodesFilter) nodes = nodes.filter((node) => nodesFilter.includes(node.id));
 
         for (const node of nodes) {
             const servers = (await client.getServers())
@@ -16,7 +18,7 @@ export async function findAvailableNode(client, memoryNeeded): Promise<number[] 
 
         return availableNodes;
     } catch (error) {
-        console.error("fan",error);
+        console.error("fan", error);
         return null;
     }
 }

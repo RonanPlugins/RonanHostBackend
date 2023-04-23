@@ -1,14 +1,14 @@
 import express from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv"
-import {strategy} from './Strategies/local.js'
+import { strategy } from './Strategies/local.js'
 
 import passport from "passport";
 
-import {AppConfig, config as configLoader} from "../config.js";
+import { AppConfig, config as configLoader } from "../config.js";
 import session from "express-session";
 import mysqlSession from "express-mysql-session";
-import {handleWebhook} from "./Events/stripe-webhook-handler.js";
+import { handleWebhook } from "./Events/stripe-webhook-handler.js";
 import ServerController from './controllers/ServerController.js';
 import userController from "./controllers/UserController.js";
 import pageController from "./controllers/PageController.js";
@@ -18,8 +18,7 @@ import registerController from "./controllers/RegistrationController.js";
 import buildHTML from "./lib/email/build/buildHTML";
 
 dotenv.config();
-const config:AppConfig = configLoader ?? (() =>
-{ console.error("You are missing the config.yml file!\nExiting..."); process.exit(1); return undefined; })();
+const config: AppConfig = configLoader ?? (() => { console.error("You are missing the config.yml file!\nExiting..."); process.exit(1); return undefined; })();
 
 const app = express();
 
@@ -35,17 +34,20 @@ const MySQLStore = mysqlSession(session);
 
 const sessionStore = new MySQLStore(options);
 
-app.use( session({
-        key: process.env.session_key,
-        secret: process.env.session_secret,
-        store: sessionStore,
-        resave: false,
-        saveUninitialized: false,
-        expires: new Date(Date.now() + (30 * 86400 * 1000)) 
-    }));
+app.use(session({
+    key: process.env.session_key,
+    secret: process.env.session_secret,
+    store: sessionStore,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        expires: new Date(Date.now() + (30 * 86400 * 1000))
+    }
+
+}));
 
 app.set("trust proxy", true);
-app.use((req:any, res:any, next:any) => {
+app.use((req: any, res: any, next: any) => {
     const origin = req.headers.origin;
     if (config.allowedOrigins.includes(origin)) {
         res.setHeader('Access-Control-Allow-Origin', origin);
@@ -79,15 +81,15 @@ app.use('/statistics', statisticsController);
 app.use('/register', registerController);
 
 
-app.get("/", (req:any, res:any) => {
+app.get("/", (req: any, res: any) => {
     res.send("Hello, world!");
 });
 
 app.listen(config.app_port, async () => {
-    console.log("Server listening on port "+config.app_port);
+    console.log("Server listening on port " + config.app_port);
 });
-process.on('SIGINT', function() {
-  console.log( "\nGracefully shutting down from SIGINT (Ctrl-C)" );
-  // some other closing procedures go here
-  process.exit(0);
+process.on('SIGINT', function () {
+    console.log("\nGracefully shutting down from SIGINT (Ctrl-C)");
+    // some other closing procedures go here
+    process.exit(0);
 });

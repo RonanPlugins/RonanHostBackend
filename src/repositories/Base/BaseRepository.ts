@@ -162,15 +162,20 @@ export default class BaseRepository<T extends {required: Record<string, any>}> {
      * @throws {DuplicateError} - If the object being updated violates a unique constraint in the database
      */
     async update(id: string, data: Partial<T>): Promise<T> {
-        delete data.required
-        const keys = Object.keys(data).map(key => `${key} = ?`).join(', ');
-        const values = Object.values(data);
-        await query(`UPDATE ${this.tableName()} SET ${keys} WHERE id = ?`, [...values, id]).catch(e => {
-            if (e.errno === 1062) throw new DuplicateError(this.tableName(), data, e);
-        });
+        delete data.required;
+
+        for (const key in data) {
+            if (data.hasOwnProperty(key)) {
+                await query(`UPDATE ${this.tableName()} SET ${key} = ? WHERE id = ?`, [data[key], id]).catch(e => {
+                    if (e.errno === 1062) throw new DuplicateError(this.tableName(), {[key]: data[key]}, e);
+                });
+            }
+        }
+
         const result = await query(`SELECT * FROM ${this.tableName()} WHERE id = ?`, [id]);
         if (result && result.length) return this.createInstance(result[0]); else throw new NotFoundError(this.tableName(), id);
     }
+
     /**
      * Deletes an object from the table with the given ID
      * @param {String} id - The ID of the object to delete

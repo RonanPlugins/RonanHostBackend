@@ -6,9 +6,16 @@ import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import config from '../ormconfig';
 import { UserService } from './user/user.service';
+import { DevtoolsModule } from '@nestjs/devtools-integration';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(config), UserModule],
+  imports: [
+    DevtoolsModule.register({
+      http: process.env.NODE_ENV !== 'production',
+    }),
+    TypeOrmModule.forRoot(config),
+    UserModule,
+  ],
   controllers: [AppController, UserController],
   providers: [AppService, UserService],
 })

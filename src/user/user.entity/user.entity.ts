@@ -14,6 +14,7 @@ import {
   IsStrongPassword,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { UserRole } from '../user-role.enum';
 
 @Entity()
 @Unique(['username', 'email'])
@@ -37,6 +38,14 @@ export class UserEntity {
   @IsEmail()
   @ApiProperty({ description: 'The email of the user.', required: true })
   email: string;
+
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.USER,
+  })
+  @ApiProperty({ description: 'The role of the user.', required: true })
+  role: UserRole;
 
   @CreateDateColumn()
   @IsOptional()

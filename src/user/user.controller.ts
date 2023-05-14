@@ -17,6 +17,7 @@ import {
 import { UserService } from './user.service';
 import { UserEntity } from './user.entity/user.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { UserDto } from './user.dto';
 
 @Controller('user')
 @ApiTags('user')
@@ -35,13 +36,9 @@ export class UserController {
       },
     },
   })
-  async register(@Body() body: UserEntity): Promise<any> {
-    const host = await this.userService.createUser(
-      body.username,
-      body.email,
-      body.password,
-    );
-    return { message: 'Host created successfully', host };
+  async register(@Body() userDto: UserDto): Promise<any> {
+    const user = await this.userService.createUser(userDto);
+    return { message: 'User created successfully', user };
   }
 
   @UseGuards(JwtAuthGuard)
@@ -49,17 +46,17 @@ export class UserController {
   @ApiCookieAuth('JWT Token')
   @ApiBody({ type: UserEntity })
   @ApiDefaultResponse({
-    description: 'Host created successfully',
+    description: 'User created successfully',
     schema: {
       type: 'object',
       properties: {
-        message: { type: 'string', example: 'Host created successfully' },
+        message: { type: 'string', example: 'User created successfully' },
         HostEntity: { $ref: '#/components/schemas/UserEntity' },
       },
     },
   })
   async getProfile(@Req() req): Promise<any> {
-    const hostEntity = await this.userService.findOneById(req.user.id);
-    return { hostEntity };
+    const userEntity = await this.userService.findOneById(req.user.id);
+    return { userEntity };
   }
 }

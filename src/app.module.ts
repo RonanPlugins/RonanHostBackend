@@ -7,11 +7,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import config from '../ormconfig';
 import { UserService } from './user/user.service';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
-import { WebhooksController } from './webhooks/webhooks.controller';
-import { PterodactylModule } from './pterodactyl/pterodactyl.module';
-import { WebhooksModule } from './webhooks/webhooks.module';
-import { StripeModule } from './webhooks/stripe/stripe.module';
-import { WebhooksController } from './webhooks/webhooks.controller';
+import { PageModule } from './page/page.module';
+import { PageService } from './page/page.service';
+import { PageController } from './page/page.controller';
+import { AuthController } from './auth/auth.controller';
+import { AuthModule } from './auth/auth.module';
+import { JwtModule, JwtService } from '@nestjs/jwt';
+import { AuthService } from './auth/auth.service';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 @Module({
   imports: [
@@ -20,11 +24,10 @@ import { WebhooksController } from './webhooks/webhooks.controller';
     }),
     TypeOrmModule.forRoot(config),
     UserModule,
-    StripeModule,
-    WebhooksModule,
-    PterodactylModule,
+    PageModule,
+    AuthModule,
   ],
-  controllers: [AppController, UserController, WebhooksController],
-  providers: [AppService, UserService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

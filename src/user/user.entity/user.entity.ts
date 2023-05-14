@@ -52,4 +52,20 @@ export class UserEntity {
   @IsDateString()
   @ApiProperty({ description: 'The update date of the user.', required: false })
   updatedAt: Date;
+
+  @Column({ nullable: true })
+  @IsOptional()
+  @ApiProperty({
+    description: 'The Stripe customer ID of the user.',
+    required: false,
+  })
+  stripeCustomerId: string;
+
+  @Column({ nullable: true })
+  @IsOptional()
+  @ApiProperty({
+    description: 'The Pterodactyl user ID of the user.',
+    required: false,
+  })
+  pterodactylUserId: string;
 }

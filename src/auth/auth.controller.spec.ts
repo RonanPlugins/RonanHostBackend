@@ -4,9 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import config from '../../ormconfig';
 import { AuthModule } from './auth.module';
 import { UserModule } from '../user/user.module';
-import { AuthService } from './auth.service';
-import { UserService } from '../user/user.service';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -16,10 +14,9 @@ describe('AuthController', () => {
       imports: [
         TypeOrmModule.forRoot(config),
         AuthModule,
-        UserModule,
         JwtModule,
+        UserModule,
       ],
-      providers: [AuthService, UserService, JwtService],
       controllers: [AuthController],
     }).compile();
 

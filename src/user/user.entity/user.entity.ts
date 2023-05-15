@@ -1,20 +1,23 @@
 import {
   Column,
   CreateDateColumn,
-  Entity,
+  Entity, OneToMany,
   PrimaryGeneratedColumn,
   Unique,
-  UpdateDateColumn,
+  UpdateDateColumn
 } from 'typeorm';
 import {
+  ArrayNotEmpty,
+  IsArray,
   IsDateString,
   IsEmail,
   IsOptional,
   IsString,
-  IsStrongPassword,
+  IsStrongPassword
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from '../user-role.enum';
+import { FeedbackEntity } from '../../feedback/feedback.entity/feedback.entity';
 
 @Entity()
 @Unique(['username', 'email'])
@@ -77,4 +80,14 @@ export class UserEntity {
     required: false,
   })
   pterodactylUserId: string;
+
+  @OneToMany(() => FeedbackEntity, (feedback: FeedbackEntity) => feedback.user)
+  @IsOptional()
+  @IsArray()
+  @ApiProperty({
+    description: 'The feedbacks owned by the user.',
+    required: false,
+    type: () => FeedbackEntity, // use a lazy resolver here
+  })
+  feedbacks: FeedbackEntity[];
 }

@@ -1,6 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { UserEntity } from './user.entity/user.entity';
 import * as bcrypt from 'bcrypt';
 import { UserDto } from './user.dto';
@@ -38,5 +38,8 @@ export class UserService {
   }
   async findOneById(id: number): Promise<UserEntity> {
     return await this.userEntityRepository.findOne({ where: { id } });
+  }
+  async deleteUser(id: number): Promise<DeleteResult> {
+    return await this.userEntityRepository.delete(id);
   }
 }

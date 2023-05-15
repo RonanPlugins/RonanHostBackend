@@ -44,4 +44,12 @@ export class PageService {
 
     return await this.pageEntityRepository.save(page);
   }
+
+  async updateServer(
+    id: number,
+    data: Partial<PageEntity>,
+  ): Promise<PageEntity> {
+    await this.pageEntityRepository.update(id, data);
+    return await this.findOne(id);
+  }
 }

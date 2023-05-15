@@ -14,6 +14,7 @@ import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth/auth.service';
+import { FeedbackController } from './feedback/feedback.controller';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -27,7 +28,7 @@ dotenv.config();
     PageModule,
     AuthModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, FeedbackController],
   providers: [AppService],
 })
 export class AppModule {}

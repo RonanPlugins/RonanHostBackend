@@ -90,4 +90,7 @@ export class UserEntity {
     type: () => FeedbackEntity, // use a lazy resolver here
   })
   feedbacks: FeedbackEntity[];
+
+  @Column({ nullable: true })
+  passwordResetToken: string;
 }

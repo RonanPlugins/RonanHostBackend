@@ -90,4 +90,45 @@ export class UserController {
     }
     await this.userService.deleteUser(id);
   }
+
+  @Post('generateResetToken/:email')
+  @ApiDefaultResponse({
+    description: 'Password reset token generated successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        resetToken: {
+          type: 'string',
+          example: 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6',
+        },
+      },
+    },
+  })
+  async generateResetToken(@Param('email') email: string) {
+    const resetToken = await this.userService.generateResetToken(email);
+    // Now you should send this token via email to the user
+    // It would be a URL like `https://api.website.com/editPasswordOrWhatever/<resetToken>`
+    return { resetToken };
+  }
+  @Get('resetPassword/:token')
+  @Post('generateResetToken/:email')
+  @ApiDefaultResponse({
+    description: 'Password reset successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        success: {
+          type: 'boolean',
+          example: 'true',
+        },
+      },
+    },
+  })
+  async resetPassword(
+    @Param('token') token: string,
+    @Body() body: { newPassword: string },
+  ) {
+    await this.userService.resetPassword(token, body.newPassword);
+    return { success: true };
+  }
 }

@@ -4,6 +4,7 @@ import { DeleteResult, Repository } from 'typeorm';
 import { UserEntity } from './user.entity/user.entity';
 import * as bcrypt from 'bcrypt';
 import { UserDto } from './user.dto';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class UserService {
@@ -41,5 +42,31 @@ export class UserService {
   }
   async deleteUser(id: number): Promise<DeleteResult> {
     return await this.userEntityRepository.delete(id);
+  }
+  async generateResetToken(email: string): Promise<string> {
+    const user = await this.userEntityRepository.findOne({ where: { email } });
+
+    if (!user) throw new Error('Invalid email');
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    user.passwordResetToken = resetToken;
+
+    await this.userEntityRepository.save(user);
+
+    return resetToken;
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    const user = await this.userEntityRepository.findOne({
+      where: { passwordResetToken: token },
+    });
+
+    if (!user) throw new Error('Invalid token');
+
+    user.password = await bcrypt.hash(newPassword, 10);
+
+    user.passwordResetToken = null;
+
+    await this.userEntityRepository.save(user);
   }
 }

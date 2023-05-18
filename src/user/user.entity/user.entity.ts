@@ -1,19 +1,19 @@
 import {
   Column,
   CreateDateColumn,
-  Entity, OneToMany,
+  Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
-  UpdateDateColumn
+  UpdateDateColumn,
 } from 'typeorm';
 import {
-  ArrayNotEmpty,
   IsArray,
   IsDateString,
   IsEmail,
   IsOptional,
   IsString,
-  IsStrongPassword
+  IsStrongPassword,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from '../user-role.enum';

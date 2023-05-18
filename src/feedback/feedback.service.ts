@@ -2,8 +2,6 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FeedbackEntity } from './feedback.entity/feedback.entity';
 import { Repository } from 'typeorm';
-import { UserEntity } from '../user/user.entity/user.entity';
-import { UserDto } from '../user/user.dto';
 import { FeedbackDto } from './feedback.dto';
 
 @Injectable()
@@ -23,7 +21,7 @@ export class FeedbackService {
     }
   }
 
-  async creatFeedback(feedbackDto: FeedbackDto): Promise<FeedbackEntity> {
+  async createFeedback(feedbackDto: FeedbackDto): Promise<FeedbackEntity> {
     const { name, ticketId, issueResolved, rating, content } = feedbackDto;
     await this.checkIfEntityExists('ticketId', ticketId);
 

@@ -1,10 +1,4 @@
-import {
-  Body,
-  Controller,
-  HttpStatus,
-  Options,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, HttpStatus, Options, Post } from '@nestjs/common';
 import { ApiBody, ApiDefaultResponse, ApiTags } from '@nestjs/swagger';
 import { UserService } from '../user/user.service';
 import { FeedbackDto } from './feedback.dto';
@@ -40,7 +34,7 @@ export class FeedbackController {
     },
   })
   async create(@Body() feedbackDto: FeedbackDto): Promise<any> {
-    const feedback = await this.feedbackService.creatFeedback(feedbackDto);
+    const feedback = await this.feedbackService.createFeedback(feedbackDto);
     return { message: 'Feedback created successfully', feedback };
   }
 }

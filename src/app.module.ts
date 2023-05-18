@@ -18,6 +18,7 @@ import { FeedbackController } from './feedback/feedback.controller';
 import { BannerController } from './banner/banner.controller';
 import * as dotenv from 'dotenv';
 import { FeedbackModule } from './feedback/feedback.module';
+import { BannerModule } from './banner/banner.module';
 dotenv.config();
 
 @Module({
@@ -30,8 +31,14 @@ dotenv.config();
     PageModule,
     AuthModule,
     FeedbackModule,
+    BannerModule,
   ],
-  controllers: [AppController, FeedbackController, BannerController],
+  controllers: [
+    AppController,
+    UserController,
+    FeedbackController,
+    BannerController,
+  ],
   providers: [AppService],
 })
 export class AppModule {}

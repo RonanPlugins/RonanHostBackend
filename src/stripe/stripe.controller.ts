@@ -12,16 +12,18 @@ import { Request, Response } from 'express';
 import { Stripe } from 'stripe';
 import { UserService } from '../user/user.service';
 import { findAvailableNode } from '../common/node/NodeAllocator';
-import { Builder, Node, Server } from '@avionrx/pterodactyl-js';
+// import { Builder, Node, Server } from '@avionrx/pterodactyl-js';
+import { PteroApp,Node,ClientServer,ApplicationServer } from '@devnote-dev/pterojs';
 
 import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-const client = new Builder()
-  .setURL('https://panel.ronanhost.com/')
-  .setAPIKey('ptla_VbxJykaIBScrnznWDxsf75SMU1EAgI3GJmdkT4fFnYD')
-  .asAdmin();
+const PterodactylApp = new PteroApp('https://panel.ronanhost.com', 'ptla_YNkDgK4VkELZqiJNJkdzChm1c0v3Ihb8KlQVT29W3E0');
+// const client = new Builder()
+//   .setURL('https://panel.ronanhost.com/')
+//   .setAPIKey('ptla_VbxJykaIBScrnznWDxsf75SMU1EAgI3GJmdkT4fFnYD')
+//   .asAdmin();
 
 const stripe = new Stripe(process.env.STRIPE_API_KEY, {
   apiVersion: '2022-11-15',
@@ -85,9 +87,7 @@ export class StripeController {
               }
             }
           }
-          const pteroUser = await client.getUser(
-            String(await userObj.pterodactyl_user_id),
-          );
+          const pteroUser = await PterodactylApp.users.fetch(String(await userObj.pterodactyl_user_id))
           // Loop through subscription items and create a server for each
           await registerProducts(
             subscription,
@@ -95,7 +95,7 @@ export class StripeController {
             res,
             subServers,
             stripe,
-            client,
+            PterodactylApp,
           );
 
           await stripe.subscriptions
@@ -141,15 +141,18 @@ export async function registerProducts(
           JSON.parse(plan.nodes),
         )
       )[0];
-      const node: Node = await pteroClient.getNode(String(nId)).catch((e) => {
-        console.error(e);
-        return undefined;
-      });
-      console.log(node);
+
+      /**
+       * Fetch the node
+       */
+      const node: Node = await PterodactylApp.nodes.fetch(nId).catch(() => null);
       if (!node) return response.status(500).json({ status: 'canceled' });
-      const availableAllocations = (await node.getAllocations())
+      // Node is not null here
+      const availableAllocations = (await PterodactylApp.allocations.fetch(nId))
+        .map(v => v)
         .filter((allocation) => allocation.assigned === false)
         .slice(0, Number(plan.allocations) + 1);
+      
       const defaultAllocation = availableAllocations[0];
       const additionalAllocations = availableAllocations
         .slice(1, Number(plan.allocations) + 1)
@@ -189,7 +192,7 @@ export async function registerProducts(
           console.error(e);
         });
 
-      if (newServer instanceof Server) {
+      if (newServer instanceof ApplicationServer) {
         subServers.push(newServer.id);
         console.log(`New server created with id` + newServer.id);
       } else {

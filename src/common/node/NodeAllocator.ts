@@ -1,4 +1,4 @@
-import { Node, Server } from '@avionrx/pterodactyl-js';
+import { Node, ClientServer as Server } from '@devnote-dev/pterojs';
 
 export async function findAvailableNode(
   client,

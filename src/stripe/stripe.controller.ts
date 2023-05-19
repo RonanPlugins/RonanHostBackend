@@ -19,11 +19,7 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-const PterodactylApp = new PteroApp('https://panel.ronanhost.com', 'ptla_YNkDgK4VkELZqiJNJkdzChm1c0v3Ihb8KlQVT29W3E0');
-// const client = new Builder()
-//   .setURL('https://panel.ronanhost.com/')
-//   .setAPIKey('ptla_VbxJykaIBScrnznWDxsf75SMU1EAgI3GJmdkT4fFnYD')
-//   .asAdmin();
+const PterodactylApp = new PteroApp('https://panel.ronanhost.com', process.env.pterodactylKey);
 
 const stripe = new Stripe(process.env.STRIPE_API_KEY, {
   apiVersion: '2022-11-15',

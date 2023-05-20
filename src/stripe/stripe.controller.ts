@@ -5,8 +5,8 @@ import {
   Post,
   RawBodyRequest,
   Req,
-  Res, UnauthorizedException,
-  UnprocessableEntityException
+  Res,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { StripeService } from './stripe.service';
 import { Request, Response } from 'express';
@@ -23,8 +23,6 @@ const pteroManager: AdminClient = new Builder()
   .setURL(process.env.PTERODACTYL_BASE_URL)
   .setAPIKey(process.env.PTERODACTYL_API_KEY)
   .asAdmin();
-
-console.log(pteroManager);
 
 const stripe = new Stripe(process.env.STRIPE_API_KEY, {
   apiVersion: '2022-11-15',
@@ -49,7 +47,7 @@ export class StripeController {
       event = stripe.webhooks.constructEvent(
         request.rawBody,
         sig,
-        'whsec_1063964c9e532dfda4ea7eb183ba7cc5de299ea29313efbbeba29d5e46d7fa3e',
+        process.env.STRIPE_SIGNING_SECRET,
       );
     } catch (err) {
       throw new InternalServerErrorException(`Webhook error`);

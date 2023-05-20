@@ -3,23 +3,28 @@ import {
   Controller,
   InternalServerErrorException,
   Post,
+  RawBodyRequest,
   Req,
-  Res,
-  UnprocessableEntityException,
+  Res, UnauthorizedException,
+  UnprocessableEntityException
 } from '@nestjs/common';
 import { StripeService } from './stripe.service';
 import { Request, Response } from 'express';
 import { Stripe } from 'stripe';
 import { UserService } from '../user/user.service';
 import { findAvailableNode } from '../common/node/NodeAllocator';
-// import { Builder, Node, Server } from '@avionrx/pterodactyl-js';
-import { PteroApp,Node,ClientServer,ApplicationServer } from '@devnote-dev/pterojs';
+import { AdminClient, Builder, Node, Server } from '@avionrx/pterodactyl-js';
 
 import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-const PterodactylApp = new PteroApp('https://panel.ronanhost.com', process.env.pterodactylKey);
+const pteroManager: AdminClient = new Builder()
+  .setURL(process.env.PTERODACTYL_BASE_URL)
+  .setAPIKey(process.env.PTERODACTYL_API_KEY)
+  .asAdmin();
+
+console.log(pteroManager);
 
 const stripe = new Stripe(process.env.STRIPE_API_KEY, {
   apiVersion: '2022-11-15',
@@ -36,23 +41,22 @@ export class StripeController {
   async handleWebhook(
     @Body() body,
     @Res() res: Response,
-    @Req() request: Request,
+    @Req() request: RawBodyRequest<Request>,
   ) {
     const sig = request.headers['stripe-signature'];
     let event;
     try {
       event = stripe.webhooks.constructEvent(
-        request.body,
+        request.rawBody,
         sig,
         'whsec_1063964c9e532dfda4ea7eb183ba7cc5de299ea29313efbbeba29d5e46d7fa3e',
       );
     } catch (err) {
-      console.error(err);
       throw new InternalServerErrorException(`Webhook error`);
     }
 
     switch (event.type) {
-      case 'subscription.created':
+      case 'customer.subscription.created':
         const subServers: number[] = [];
         try {
           const subscription = event.data.object as Stripe.Subscription;
@@ -65,25 +69,42 @@ export class StripeController {
             userObj = await this.userService.findOne({
               where: { stripeCustomerId: customer.id },
             });
+            if (!userObj) throw new Error('Non existent customer.id');
           } catch (e) {
             if ('email' in customer) {
               try {
                 userObj = await this.userService.findOne({
                   where: { email: customer.email },
                 });
-                userObj.stripeCustomerId = customer.id;
-                userObj.save();
+                userObj = await this.userService.updateUser(userObj.id, {
+                  stripeCustomerId: customer.id,
+                });
               } catch (e) {
                 const tempPassword = generateTempPassword();
-                userObj = await this.userService.createUser({
+                const names = customer.name.split(' ');
+                const ptU = await pteroManager.createUser({
+                  firstName: names[0],
+                  lastName: names[1],
+                  username: `${names[0]}-${Math.floor(Math.random() * 1e6)
+                    .toString()
+                    .padStart(6, '0')}`,
+                  email: customer.email,
+                });
+                const crUs = await this.userService.createUser({
                   username: customer.email,
                   email: customer.email,
                   password: tempPassword,
                 });
+                userObj = await this.userService.updateUser(crUs.id, {
+                  pterodactylUserId: String(ptU.id),
+                  stripeCustomerId: customer.id,
+                });
               }
             }
           }
-          const pteroUser = await PterodactylApp.users.fetch(String(await userObj.pterodactyl_user_id))
+          const pteroUser = await pteroManager.getUser(
+            String(userObj.pterodactylUserId),
+          );
           // Loop through subscription items and create a server for each
           await registerProducts(
             subscription,
@@ -91,7 +112,7 @@ export class StripeController {
             res,
             subServers,
             stripe,
-            PterodactylApp,
+            pteroManager,
           );
 
           await stripe.subscriptions
@@ -117,7 +138,6 @@ export class StripeController {
   }
 }
 
-// Placeholder function for registerProducts
 export async function registerProducts(
   subscription,
   pteroUser,
@@ -137,27 +157,27 @@ export async function registerProducts(
           JSON.parse(plan.nodes),
         )
       )[0];
-
-      /**
-       * Fetch the node
-       */
-      const node: Node = await PterodactylApp.nodes.fetch(nId).catch(() => null);
+      const node: Node = await pteroManager
+        .getNode(String(nId))
+        .catch(() => null);
       if (!node) return response.status(500).json({ status: 'canceled' });
       // Node is not null here
-      const availableAllocations = (await PterodactylApp.allocations.fetch(nId))
-        .map(v => v)
+      const availableAllocations = (await node.getAllocations())
+        .map((v) => v)
         .filter((allocation) => allocation.assigned === false)
         .slice(0, Number(plan.allocations) + 1);
-      
+
       const defaultAllocation = availableAllocations[0];
       const additionalAllocations = availableAllocations
         .slice(1, Number(plan.allocations) + 1)
         .map((allocation) => allocation.id);
-      const newServer = await pteroClient
+      console.log(pteroManager, node);
+      const newServer = await pteroManager
         .createServer({
           name: String(pteroUser.firstName) + "'s server",
           user: pteroUser.id,
           egg: 5,
+          image: 'ghcr.io/pterodactyl/yolks:java_17',
           startup:
             'java -Xms$(({{SERVER_MEMORY}}-512))M -Xmx{{SERVER_MEMORY}}M -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 --add-modules=jdk.incubator.vector -jar {{SERVER_JARFILE}} --nogui',
           environment: {
@@ -188,7 +208,7 @@ export async function registerProducts(
           console.error(e);
         });
 
-      if (newServer instanceof ApplicationServer) {
+      if (newServer instanceof Server) {
         subServers.push(newServer.id);
         console.log(`New server created with id` + newServer.id);
       } else {

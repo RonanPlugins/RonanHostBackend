@@ -6,6 +6,7 @@ import * as cookieParser from 'cookie-parser';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     snapshot: true,
+    rawBody: true,
   });
   const swaggerConfig = new DocumentBuilder()
     .setTitle('RonanServers API')

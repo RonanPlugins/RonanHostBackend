@@ -5,6 +5,7 @@ import { UserEntity } from './user.entity/user.entity';
 import * as bcrypt from 'bcrypt';
 import { UserDto } from './user.dto';
 import * as crypto from 'crypto';
+import { PageEntity } from '../page/page.entity/page.entity';
 
 @Injectable()
 export class UserService {
@@ -71,5 +72,9 @@ export class UserService {
     user.passwordResetToken = null;
 
     await this.userEntityRepository.save(user);
+  }
+  async updateUser(id: number, data: Partial<UserEntity>): Promise<UserEntity> {
+    await this.userEntityRepository.update(id, data);
+    return await this.findOne({ where: { id } });
   }
 }

@@ -7,6 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     snapshot: true,
     rawBody: true,
+    cors: true,
   });
   const swaggerConfig = new DocumentBuilder()
     .setTitle('RonanServers API')

@@ -82,7 +82,7 @@ export class StripeController {
                 const names = customer.name.split(' ');
                 const ptU = await pteroManager.createUser({
                   firstName: names[0],
-                  lastName: names[1],
+                  lastName: names[1] || names[0],
                   username: `${names[0]}-${Math.floor(Math.random() * 1e6)
                     .toString()
                     .padStart(6, '0')}`,

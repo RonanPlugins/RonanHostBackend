@@ -21,7 +21,7 @@ dotenv.config();
   imports: [
     DevtoolsModule.register({
       http: process.env.NODE_ENV !== 'production',
-      port: Number(process.env.APP_PORT),
+      port: Number(process.env.DEVTOOLS_PORT),
     }),
     TypeOrmModule.forRoot(config),
     UserModule,

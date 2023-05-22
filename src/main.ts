@@ -9,8 +9,16 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     snapshot: true,
     rawBody: true,
-    cors: true,
   });
+
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+  });
+
+  app.use(cookieParser());
+
   const swaggerConfig = new DocumentBuilder()
     .setTitle('RonanServers API')
     .setDescription('API for RonanServers')
@@ -20,13 +28,8 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api', app, document);
-  app.enableCors({
-    origin: true,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true,
-  });
-  app.use(cookieParser());
 
   await app.listen(process.env.APPLICATION_PORT);
 }
+
 bootstrap();

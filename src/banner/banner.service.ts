@@ -1,7 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BannerEntity } from './banner.entity/banner.entity';
-import { Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
 import { FeedbackEntity } from '../feedback/feedback.entity/feedback.entity';
 import { FeedbackDto } from '../feedback/feedback.dto';
 import { BannerDto } from './banner.dto';
@@ -21,7 +21,9 @@ export class BannerService {
       throw new ConflictException(`${column} already exists`);
     }
   }
-
+  findAll(): Promise<BannerEntity[]> {
+    return this.bannerEntityRepository.find();
+  }
   async createBanner(bannerDto: BannerDto): Promise<BannerEntity> {
     const { minutesBetweenPopup, clickUrl, text, enabled, allowClose, type } =
       bannerDto;

@@ -28,4 +28,11 @@ export class AuthController {
     res.cookie('token', token, { httpOnly: false, expires: expirationDate });
     return req.user;
   }
+
+  @Post('logout')
+  async logout(@Req() req, @Res({ passthrough: true }) res: Response) {
+    console.log('logout');
+    res.clearCookie('token');
+    return { done: true };
+  }
 }

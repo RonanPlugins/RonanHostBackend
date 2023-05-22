@@ -1,4 +1,11 @@
-import { Body, Controller, HttpStatus, Options, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Options,
+  Post,
+} from '@nestjs/common';
 import { ApiBody, ApiDefaultResponse, ApiTags } from '@nestjs/swagger';
 import { BannerService } from './banner.service';
 import { BannerEntity } from './banner.entity/banner.entity';
@@ -7,9 +14,7 @@ import { BannerDto } from './banner.dto';
 @Controller('banner')
 @ApiTags('banner')
 export class BannerController {
-  constructor(
-    private bannerService: BannerService,
-  ) {}
+  constructor(private bannerService: BannerService) {}
 
   @Options()
   options(): any {
@@ -18,6 +23,11 @@ export class BannerController {
       message: 'The following methods are supported for this route',
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     };
+  }
+
+  @Get()
+  async findAll(): Promise<BannerEntity[]> {
+    return await this.bannerService.findAll();
   }
 
   @Post('create')

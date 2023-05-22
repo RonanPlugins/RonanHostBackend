@@ -6,7 +6,6 @@ import * as bcrypt from 'bcrypt';
 import { UserDto } from './user.dto';
 import * as crypto from 'crypto';
 import { PageEntity } from '../page/page.entity/page.entity';
-
 @Injectable()
 export class UserService {
   constructor(
@@ -28,8 +27,14 @@ export class UserService {
     await this.checkIfEntityExists('email', email);
 
     const passwordHash = await bcrypt.hash(password, 10);
-
     const host = new UserEntity();
+    host.avatar =
+      'https://s.gravatar.com/avatar/' +
+      crypto
+        .createHash('md5')
+        .update(email.trim().toLowerCase())
+        .digest('hex') +
+      '?d=mp';
     host.username = username;
     host.password = passwordHash;
     host.email = email;

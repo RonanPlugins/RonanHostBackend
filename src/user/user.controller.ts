@@ -76,7 +76,7 @@ export class UserController {
   })
   async getProfile(@Req() req): Promise<any> {
     const userEntity = await this.userService.findOneById(req.user.id);
-    return { userEntity };
+    return userEntity;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -108,7 +108,7 @@ export class UserController {
     const resetToken = await this.userService.generateResetToken(email);
     // Now you should send this token via email to the user
     // It would be a URL like `https://api.website.com/editPasswordOrWhatever/<resetToken>`
-    return { resetToken };
+    return resetToken;
   }
   @Get('resetPassword/:token')
   @Post('generateResetToken/:email')

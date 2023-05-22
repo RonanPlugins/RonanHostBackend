@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
@@ -15,7 +15,7 @@ export class PageEntity {
   @ApiProperty({ description: 'The name of the page.', required: true })
   name: string;
 
-  @Column()
+  @Column({ length: 9000, type: 'varchar' })
   @IsString()
   @ApiProperty({ description: 'The content of the page.', required: true })
   content: string;

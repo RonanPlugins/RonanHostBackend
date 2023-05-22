@@ -42,6 +42,11 @@ export class UserEntity {
   @ApiProperty({ description: 'The email of the user.', required: true })
   email: string;
 
+  @Column()
+  @IsString()
+  @ApiProperty({ description: 'The avatar url of the user.', required: true })
+  avatar: string;
+
   @Column({
     type: 'enum',
     enum: UserRole,

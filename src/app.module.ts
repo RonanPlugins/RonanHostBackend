@@ -15,6 +15,8 @@ import { FeedbackModule } from './feedback/feedback.module';
 import { BannerModule } from './banner/banner.module';
 import { StripeModule } from './stripe/stripe.module';
 import { StripeController } from './stripe/stripe.controller';
+import { ReferralController } from './referral/referral.controller';
+import { ReferralModule } from './referral/referral.module';
 dotenv.config();
 
 @Module({
@@ -30,6 +32,7 @@ dotenv.config();
     FeedbackModule,
     BannerModule,
     StripeModule,
+    ReferralModule,
   ],
   controllers: [
     AppController,
@@ -37,6 +40,7 @@ dotenv.config();
     FeedbackController,
     BannerController,
     StripeController,
+    ReferralController,
   ],
   providers: [AppService],
 })

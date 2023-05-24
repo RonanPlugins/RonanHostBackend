@@ -22,7 +22,10 @@ export class AuthController {
     const delay = Math.floor(Math.random() * 200);
     await new Promise((resolve) => setTimeout(resolve, delay));
 
-    const payload = { username: req.user.username, id: req.user.id };
+    const payload = {
+      username: req.user.username.toLowerCase(),
+      id: req.user.id,
+    };
     const token = this.jwtService.sign(payload);
     const expirationDate = new Date(Date.now() + 2592000 * 1000); // 30 days
     res.cookie('token', token, { httpOnly: false, expires: expirationDate });

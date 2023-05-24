@@ -1,7 +1,7 @@
 import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
-import { ReferralEntity } from './referral.entity';
+import { ReferralEntity } from './referral.entity/referral.entity';
 import { ReferralDto } from './referral.dto';
 
 @Injectable()

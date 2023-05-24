@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Request,
   Delete,
   Get,
   HttpStatus,
@@ -9,10 +8,11 @@ import {
   Param,
   Post,
   Req,
+  Request,
+  UnauthorizedException,
   UseGuards,
   UsePipes,
   ValidationPipe,
-  UnauthorizedException,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -75,8 +75,7 @@ export class UserController {
     },
   })
   async getProfile(@Req() req): Promise<any> {
-    const userEntity = await this.userService.findOneById(req.user.id);
-    return userEntity;
+    return await this.userService.findOneById(req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -104,11 +103,8 @@ export class UserController {
       },
     },
   })
-  async generateResetToken(@Param('email') email: string) {
-    const resetToken = await this.userService.generateResetToken(email);
-    // Now you should send this token via email to the user
-    // It would be a URL like `https://api.website.com/editPasswordOrWhatever/<resetToken>`
-    return resetToken;
+  async generateResetToken(@Param('email') email: string): Promise<string> {
+    return await this.userService.generateResetToken(email);
   }
   @Get('resetPassword/:token')
   @Post('generateResetToken/:email')

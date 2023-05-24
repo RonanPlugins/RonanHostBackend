@@ -14,11 +14,8 @@ export class UserService {
   ) {}
 
   async checkIfEntityExists(column: keyof UserEntity, value: any) {
-    if (
-      await this.userEntityRepository.findOne({ where: { [column]: value } })
-    ) {
+    if (await this.userEntityRepository.findOne({ where: { [column]: value } }))
       throw new ConflictException(`${column} already exists`);
-    }
   }
 
   async createUser(userDto: UserDto): Promise<UserEntity> {

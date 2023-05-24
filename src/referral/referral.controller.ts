@@ -19,7 +19,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserRole } from 'src/user/user-role.enum';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { ReferralEntity } from './referral.entity';
+import { ReferralEntity } from './referral.entity/referral.entity';
 import { ReferralDto } from './referral.dto';
 
 @Controller('referral')

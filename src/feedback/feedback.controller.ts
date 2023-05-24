@@ -2,7 +2,7 @@ import { Body, Controller, HttpStatus, Options, Post } from '@nestjs/common';
 import { ApiBody, ApiDefaultResponse, ApiTags } from '@nestjs/swagger';
 import { UserService } from '../user/user.service';
 import { FeedbackDto } from './feedback.dto';
-import { FeedbackEntity } from './feedback.entity/feedback.entity';
+import { FeedbackEntity } from './feedback.entity';
 import { FeedbackService } from './feedback.service';
 
 @Controller('feedback')

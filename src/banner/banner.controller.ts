@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { ApiBody, ApiDefaultResponse, ApiTags } from '@nestjs/swagger';
 import { BannerService } from './banner.service';
-import { BannerEntity } from './banner.entity/banner.entity';
+import { BannerEntity } from './banner.entity';
 import { BannerDto } from './banner.dto';
 
 @Controller('banner')

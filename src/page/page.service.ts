@@ -1,9 +1,9 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PageEntity } from './page.entity/page.entity';
+import { PageEntity } from './page.entity';
 import { FindManyOptions, Repository } from 'typeorm';
 import { UserDto } from '../user/user.dto';
-import { UserEntity } from '../user/user.entity/user.entity';
+import { UserEntity } from '../user/user.entity';
 import { PageDto } from './page.dto';
 
 @Injectable()

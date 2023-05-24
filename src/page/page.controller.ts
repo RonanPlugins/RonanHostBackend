@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpStatus, Options, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { PageService } from './page.service';
-import { PageEntity } from './page.entity/page.entity';
+import { PageEntity } from './page.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RoleAuthGuard } from '../auth/guards/role-auth.guard';
 import { UserRole } from '../user/user-role.enum';

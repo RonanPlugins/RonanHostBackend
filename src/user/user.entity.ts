@@ -16,8 +16,8 @@ import {
   IsStrongPassword,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { UserRole } from '../user-role.enum';
-import { FeedbackEntity } from '../../feedback/feedback.entity/feedback.entity';
+import { UserRole } from './user-role.enum';
+import { FeedbackEntity } from '../feedback/feedback.entity';
 
 @Entity()
 @Unique(['username', 'email'])

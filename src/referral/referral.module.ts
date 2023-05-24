@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ReferralEntity } from './referral.entity/referral.entity';
+import { ReferralEntity } from './referral.entity';
 import { ReferralService } from './referral.service';
 import { ReferralController } from './referral.controller';
 

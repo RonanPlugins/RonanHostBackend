@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { BannerType } from '../banner-type.enum';
+import { BannerType } from './banner-type.enum';
 
 @Entity()
 export class BannerEntity {

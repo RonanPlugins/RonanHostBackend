@@ -1,11 +1,11 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, FindOneOptions, Repository } from 'typeorm';
-import { UserEntity } from './user.entity/user.entity';
+import { UserEntity } from './user.entity';
 import * as bcrypt from 'bcrypt';
 import { UserDto } from './user.dto';
 import * as crypto from 'crypto';
-import { PageEntity } from '../page/page.entity/page.entity';
+import { PageEntity } from '../page/page.entity';
 @Injectable()
 export class UserService {
   constructor(

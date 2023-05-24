@@ -1,8 +1,8 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BannerEntity } from './banner.entity/banner.entity';
+import { BannerEntity } from './banner.entity';
 import { FindManyOptions, Repository } from 'typeorm';
-import { FeedbackEntity } from '../feedback/feedback.entity/feedback.entity';
+import { FeedbackEntity } from '../feedback/feedback.entity';
 import { FeedbackDto } from '../feedback/feedback.dto';
 import { BannerDto } from './banner.dto';
 

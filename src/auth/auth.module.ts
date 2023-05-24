@@ -6,7 +6,7 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { LocalStrategy } from './local.strategy';
-import { UserEntity } from '../user/user.entity/user.entity';
+import { UserEntity } from '../user/user.entity';
 import { UserModule } from '../user/user.module';
 import * as dotenv from 'dotenv';
 import * as process from 'process';

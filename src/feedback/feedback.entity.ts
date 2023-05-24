@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { UserEntity } from '../../user/user.entity/user.entity';
+import { UserEntity } from '../user/user.entity';
 
 @Entity()
 @Unique(['ticketId'])

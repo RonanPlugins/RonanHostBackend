@@ -1,6 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FeedbackEntity } from './feedback.entity/feedback.entity';
+import { FeedbackEntity } from './feedback.entity';
 import { Repository } from 'typeorm';
 import { FeedbackDto } from './feedback.dto';
 

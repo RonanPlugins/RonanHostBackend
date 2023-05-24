@@ -90,7 +90,7 @@ export class UserController {
     await this.userService.deleteUser(id);
   }
 
-  @Post('generateResetToken/:email')
+  @Post('generateResetToken')
   @ApiDefaultResponse({
     description: 'Password reset token generated successfully',
     schema: {
@@ -103,8 +103,8 @@ export class UserController {
       },
     },
   })
-  async generateResetToken(@Param('email') email: string): Promise<string> {
-    return await this.userService.generateResetToken(email);
+  async generateResetToken(@Body() body: { email: string }): Promise<string> {
+    return await this.userService.generateResetToken(body.email);
   }
   @Get('resetPassword/:token')
   @Post('generateResetToken/:email')

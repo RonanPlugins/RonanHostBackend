@@ -15,7 +15,7 @@ export class PageEntity {
   @ApiProperty({ description: 'The name of the page.', required: true })
   name: string;
 
-  @Column({ length: 9000, type: 'varchar' })
+  @Column({ type: 'longtext' })
   @IsString()
   @ApiProperty({ description: 'The content of the page.', required: true })
   content: string;

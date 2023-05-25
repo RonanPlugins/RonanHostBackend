@@ -44,7 +44,7 @@ export class UserEntity {
 
   @Column()
   @IsString()
-  @ApiProperty({ description: 'The avatar url of the user.', required: true })
+  @ApiProperty({ description: 'The avatar url of the user.', required: false })
   avatar: string;
 
   @Column({

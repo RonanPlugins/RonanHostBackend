@@ -92,6 +92,7 @@ export class StripeController {
                   username: customer.email,
                   email: customer.email,
                   password: tempPassword,
+                  newsLetter: false,
                 });
                 userObj = await this.userService.updateUser(crUs.id, {
                   pterodactylUserId: String(ptU.id),

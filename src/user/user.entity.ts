@@ -55,6 +55,14 @@ export class UserEntity {
   @ApiProperty({ description: 'The role of the user.', required: true })
   role: UserRole;
 
+  @Column({ default: false })
+  @ApiProperty({
+    description: 'Does the user want news from newsletter?',
+    default: false,
+  })
+  @IsOptional()
+  newsLetter: boolean;
+
   @CreateDateColumn()
   @IsOptional()
   @IsDateString()

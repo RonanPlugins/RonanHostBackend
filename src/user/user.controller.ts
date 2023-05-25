@@ -44,7 +44,7 @@ export class UserController {
   }
   @Post('register')
   @UsePipes(new ValidationPipe())
-  @ApiBody({ type: UserEntity })
+  @ApiBody({ type: UserDto })
   @ApiDefaultResponse({
     description: 'User created successfully',
     schema: {

@@ -3,7 +3,7 @@ import {
   HealthCheckService,
   HttpHealthIndicator,
   HealthCheck,
-  TypeOrmHealthIndicator,
+  TypeOrmHealthIndicator, DiskHealthIndicator, MemoryHealthIndicator
 } from '@nestjs/terminus';
 
 @Controller('health')
@@ -12,6 +12,8 @@ export class HealthController {
     private health: HealthCheckService,
     private http: HttpHealthIndicator,
     private db: TypeOrmHealthIndicator,
+    private readonly disk: DiskHealthIndicator,
+    private memory: MemoryHealthIndicator,
   ) {}
 
   @Get()
@@ -24,6 +26,9 @@ export class HealthController {
           'https://api.ronanhost.com/api',
         ),
       () => this.db.pingCheck('database'),
+      () =>
+        this.disk.checkStorage('storage', { path: '/', thresholdPercent: 0.5 }),
+      () => this.memory.checkHeap('memory_heap', 150 * 1024 * 1024),
     ]);
   }
 }

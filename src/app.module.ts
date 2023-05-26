@@ -17,6 +17,10 @@ import { StripeModule } from './stripe/stripe.module';
 import { StripeController } from './stripe/stripe.controller';
 import { ReferralController } from './referral/referral.controller';
 import { ReferralModule } from './referral/referral.module';
+import { HealthModule } from './health/health.module';
+import { PartnershipRequestModule } from './partnership-request/partnership-request.module';
+import { PartnershipRequestController } from './partnership-request/partnership-request.controller';
+import { PartnershipModule } from './partnership/partnership.module';
 dotenv.config();
 
 @Module({
@@ -33,6 +37,9 @@ dotenv.config();
     BannerModule,
     StripeModule,
     ReferralModule,
+    PartnershipRequestModule,
+    HealthModule,
+    PartnershipModule,
   ],
   controllers: [
     AppController,
@@ -41,6 +48,7 @@ dotenv.config();
     BannerController,
     StripeController,
     ReferralController,
+    PartnershipRequestController,
   ],
   providers: [AppService],
 })

@@ -34,7 +34,7 @@ export class ReferralService {
     }
   }
   async createReferral(refferalDto: ReferralDto): Promise<ReferralEntity> {
-    const { token, uses, owner, additional_info } = refferalDto;
+    const { token, owner, additional_info } = refferalDto;
     await this.checkIfEntityExists('token', token);
 
     const referral = new ReferralEntity();

@@ -12,7 +12,11 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: ['http://localhost:3000',"https://ronanhost.com","https://www.ronanhost.com"],
+    origin: [
+      'http://localhost:3000',
+      'https://ronanhost.com',
+      'https://www.ronanhost.com',
+    ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
@@ -20,10 +24,9 @@ async function bootstrap() {
   app.use(cookieParser());
 
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('RonanServers API')
-    .setDescription('API for RonanServers')
+    .setTitle('RonanHost API')
+    .setDescription('API for RonanHost')
     .setVersion(process.env.npm_package_version)
-    .addTag('server')
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);

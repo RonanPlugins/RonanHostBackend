@@ -1,4 +1,4 @@
-import { IsBoolean, IsEnum, IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class ReferralDto {
   @IsString()
@@ -12,4 +12,8 @@ export class ReferralDto {
 
   @IsString()
   additional_info: string;
+}
+
+export class TokenDto implements Partial<ReferralDto> {
+  token: ReferralDto['token'];
 }

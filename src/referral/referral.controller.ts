@@ -12,7 +12,6 @@ import {
   HttpStatus,
   Delete,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { ReferralService } from './referral.service';
 import { RoleAuthGuard } from '../auth/guards/role-auth.guard';
 import { ApiTags } from '@nestjs/swagger';
@@ -20,7 +19,7 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserRole } from 'src/user/user-role.enum';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ReferralEntity } from './referral.entity';
-import { ReferralDto } from './referral.dto';
+import { ReferralDto, TokenDto } from './referral.dto';
 
 @Controller('referral')
 @ApiTags('referral')
@@ -37,11 +36,9 @@ export class ReferralController {
   }
 
   @Put('use')
-  async useReferral(@Body() body: { token: string }, @Req() request: Request) {
-    const { token } = body;
-
+  async useReferral(@Body() body: TokenDto) {
     // Call the referral service to handle the referral token and IP address
-    await this.referralService.handleReferralToken(token);
+    await this.referralService.handleReferralToken(body.token);
 
     return { message: 'Referral token used successfully' };
   }

@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
@@ -18,6 +19,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from './user-role.enum';
 import { FeedbackEntity } from '../feedback/feedback.entity';
+import { PartnershipRequestEntity } from '../partnership-request/entities/partnership-request.entity';
 
 @Entity()
 @Unique(['username', 'email'])
@@ -103,6 +105,12 @@ export class UserEntity {
     type: () => FeedbackEntity, // use a lazy resolver here
   })
   feedbacks: FeedbackEntity[];
+
+  @OneToOne(
+    () => PartnershipRequestEntity,
+    (partnershipRequest) => partnershipRequest.user,
+  )
+  partnershipRequest: PartnershipRequestEntity;
 
   @Column({ nullable: true })
   passwordResetToken: string;

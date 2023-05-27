@@ -1,69 +1,71 @@
 import { ConflictException, Injectable } from '@nestjs/common';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, FindOneOptions, Repository } from 'typeorm';
-import { UserEntity } from './user.entity';
 import * as bcrypt from 'bcrypt';
-import { UserDto } from './user.dto';
 import * as crypto from 'crypto';
-import { PageEntity } from '../page/page.entity';
+import { User } from './entities/user.entity';
+import { Repository } from 'typeorm';
+
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(UserEntity)
-    private userEntityRepository: Repository<UserEntity>,
+    @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
-  async checkIfEntityExists(column: keyof UserEntity, value: any) {
-    if (await this.userEntityRepository.findOne({ where: { [column]: value } }))
+  async checkIfEntityExists(column: keyof User, value: any) {
+    if (await this.userRepository.findOne({ where: { [column]: value } }))
       throw new ConflictException(`${column} already exists`);
   }
+  async create(createUserDto: CreateUserDto) {
+    const { password } = createUserDto;
+    await this.checkIfEntityExists('username', createUserDto.username);
+    await this.checkIfEntityExists('email', createUserDto.email);
 
-  async createUser(userDto: UserDto): Promise<UserEntity> {
-    const { username, email, password } = userDto;
-    await this.checkIfEntityExists('username', username);
-    await this.checkIfEntityExists('email', email);
-
-    const passwordHash = await bcrypt.hash(password, 10);
-    const host = new UserEntity();
-    host.avatar =
+    createUserDto.password = await bcrypt.hash(password, 10);
+    const user = this.userRepository.create(createUserDto);
+    user.avatar =
       'https://s.gravatar.com/avatar/' +
       crypto
         .createHash('md5')
-        .update(email.trim().toLowerCase())
+        .update(createUserDto.email.trim().toLowerCase())
         .digest('hex') +
       '?d=mp';
-    host.username = username;
-    host.password = passwordHash;
-    host.email = email;
-    return await this.userEntityRepository.save(host);
+    return await this.userRepository.save(user);
   }
-  async findOneByUsername(username: string): Promise<UserEntity> {
-    return await this.userEntityRepository.findOne({ where: { username } });
+
+  async findAll(): Promise<User[]> {
+    return await this.userRepository.find();
   }
-  async findOneById(id: number): Promise<UserEntity> {
-    return await this.userEntityRepository.findOne({ where: { id } });
+
+  async findOne(id: number): Promise<User> {
+    return await this.userRepository.findOne({ where: { id } });
   }
-  async deleteUser(id: number): Promise<DeleteResult> {
-    return await this.userEntityRepository.delete(id);
+
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    await this.userRepository.update(id, updateUserDto);
+    return this.userRepository.findOne({ where: { id } });
   }
-  async findOne(findOneOptions: FindOneOptions): Promise<UserEntity> {
-    return await this.userEntityRepository.findOne(findOneOptions);
+
+  async remove(id: number) {
+    return await this.userRepository.delete(id);
   }
+
   async generateResetToken(email: string): Promise<string> {
-    const user = await this.userEntityRepository.findOne({ where: { email } });
+    const user = await this.userRepository.findOne({ where: { email } });
 
     if (!user) throw new Error('Invalid email');
 
     const resetToken = crypto.randomBytes(32).toString('hex');
     user.passwordResetToken = resetToken;
 
-    await this.userEntityRepository.save(user);
+    await this.userRepository.save(user);
 
     return resetToken;
   }
 
   async resetPassword(token: string, newPassword: string): Promise<void> {
-    const user = await this.userEntityRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: { passwordResetToken: token },
     });
 
@@ -73,10 +75,10 @@ export class UserService {
 
     user.passwordResetToken = null;
 
-    await this.userEntityRepository.save(user);
+    await this.userRepository.save(user);
   }
-  async updateUser(id: number, data: Partial<UserEntity>): Promise<UserEntity> {
-    await this.userEntityRepository.update(id, data);
-    return await this.findOne({ where: { id } });
+  async updateUser(id: number, data: Partial<User>): Promise<User> {
+    await this.userRepository.update(id, data);
+    return await this.findOne(id);
   }
 }

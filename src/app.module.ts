@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UserController } from './user/user.controller';
-import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import config from '../ormconfig';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
@@ -20,6 +18,7 @@ import { ReferralModule } from './referral/referral.module';
 import { HealthModule } from './health/health.module';
 import { PartnerModule } from './partner/partner.module';
 import { PartnerController } from './partner/partner.controller';
+import { UserModule } from './user/user.module';
 dotenv.config();
 
 @Module({
@@ -29,7 +28,6 @@ dotenv.config();
       port: Number(process.env.DEVTOOLS_PORT),
     }),
     TypeOrmModule.forRoot(config),
-    UserModule,
     PageModule,
     AuthModule,
     FeedbackModule,
@@ -38,10 +36,10 @@ dotenv.config();
     ReferralModule,
     HealthModule,
     PartnerModule,
+    UserModule,
   ],
   controllers: [
     AppController,
-    UserController,
     FeedbackController,
     BannerController,
     StripeController,

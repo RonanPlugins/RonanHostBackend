@@ -3,7 +3,9 @@ import {
   HealthCheckService,
   HttpHealthIndicator,
   HealthCheck,
-  TypeOrmHealthIndicator, DiskHealthIndicator, MemoryHealthIndicator
+  TypeOrmHealthIndicator,
+  DiskHealthIndicator,
+  MemoryHealthIndicator,
 } from '@nestjs/terminus';
 
 @Controller('health')

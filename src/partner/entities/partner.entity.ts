@@ -8,7 +8,7 @@ import {
 import { UserEntity } from '../../user/user.entity';
 
 @Entity()
-export class PartnershipRequestEntity {
+export class Partner {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -30,10 +30,16 @@ export class PartnershipRequestEntity {
   @Column()
   estimatedPeakPlayerCount: number;
 
+  @Column()
+  accepted: boolean;
+
   @Column({ type: 'text', nullable: true })
   additionalInfo: string;
 
   @OneToOne(() => UserEntity)
   @JoinColumn({ name: 'userId' })
   user: UserEntity;
+
+  @Column({ type: 'json', nullable: true })
+  serverIds: number[];
 }

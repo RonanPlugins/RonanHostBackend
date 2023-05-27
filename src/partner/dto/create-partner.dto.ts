@@ -1,7 +1,7 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class CreatePartnershipRequestDto {
+export class CreatePartnerDto {
   @ApiProperty()
   @IsString()
   name: string;

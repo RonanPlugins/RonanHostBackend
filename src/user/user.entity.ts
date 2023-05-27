@@ -19,7 +19,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from './user-role.enum';
 import { FeedbackEntity } from '../feedback/feedback.entity';
-import { PartnershipRequestEntity } from '../partnership-request/entities/partnership-request.entity';
+import { Partner } from '../partner/entities/partner.entity';
 
 @Entity()
 @Unique(['username', 'email'])
@@ -106,11 +106,8 @@ export class UserEntity {
   })
   feedbacks: FeedbackEntity[];
 
-  @OneToOne(
-    () => PartnershipRequestEntity,
-    (partnershipRequest) => partnershipRequest.user,
-  )
-  partnershipRequest: PartnershipRequestEntity;
+  @OneToOne(() => Partner, (partner) => partner.user)
+  partner: Partner;
 
   @Column({ nullable: true })
   passwordResetToken: string;

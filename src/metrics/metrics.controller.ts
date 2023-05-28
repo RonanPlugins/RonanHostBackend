@@ -1,6 +1,10 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { AdminClient, Builder } from '@avionrx/pterodactyl-js';
 import * as ping from 'ping';
+import { Roles } from '../common/decorators/roles.decorator';
+import { UserRole } from '../user/user-role.enum';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RoleAuthGuard } from '../auth/guards/role-auth.guard';
 
 const pteroManager: AdminClient = new Builder()
   .setURL(process.env.PTERODACTYL_BASE_URL)
@@ -8,6 +12,8 @@ const pteroManager: AdminClient = new Builder()
   .asAdmin();
 
 @Controller('metrics')
+@UseGuards(JwtAuthGuard, RoleAuthGuard)
+@Roles(UserRole.ADMIN)
 export class MetricsController {
   @Get('nodes')
   async nodes(): Promise<any[]> {

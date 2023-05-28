@@ -20,6 +20,8 @@ import { ReferralModule } from './referral/referral.module';
 import { HealthModule } from './health/health.module';
 import { PartnerModule } from './partner/partner.module';
 import { PartnerController } from './partner/partner.controller';
+import { MetricsController } from './metrics/metrics.controller';
+import { MetricsModule } from './metrics/metrics.module';
 dotenv.config();
 
 @Module({
@@ -38,6 +40,7 @@ dotenv.config();
     ReferralModule,
     HealthModule,
     PartnerModule,
+    MetricsModule,
   ],
   controllers: [
     AppController,
@@ -47,6 +50,7 @@ dotenv.config();
     StripeController,
     ReferralController,
     PartnerController,
+    MetricsController,
   ],
   providers: [AppService],
 })

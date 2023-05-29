@@ -15,6 +15,17 @@ const pteroManager: AdminClient = new Builder()
 @UseGuards(JwtAuthGuard, RoleAuthGuard)
 @Roles(UserRole.ADMIN)
 export class MetricsController {
+  @Get()
+  async fullReport() {
+    const nodeReport = await this.nodes();
+    const userReport = await this.userCount();
+    return { nodes: nodeReport, userCount: userReport };
+  }
+
+  @Get('users')
+  async userCount(): Promise<number> {
+    return (await pteroManager.getUsers()).length;
+  }
   @Get('nodes')
   async nodes(): Promise<any[]> {
     const servers = await pteroManager.getServers();

@@ -2,32 +2,32 @@ import { Injectable } from '@nestjs/common';
 import { CreatePartnerDto } from './dto/create-partner.dto';
 import { UpdatePartnerDto } from './dto/update-partner.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Partner } from './entities/partner.entity';
+import { PartnerEntity } from './entities/partner.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class PartnerService {
   constructor(
-    @InjectRepository(Partner) private partnerRepository: Repository<Partner>,
+    @InjectRepository(PartnerEntity) private partnerRepository: Repository<PartnerEntity>,
   ) {}
 
-  create(createPartnerDto: CreatePartnerDto): Promise<Partner> {
+  create(createPartnerDto: CreatePartnerDto): Promise<PartnerEntity> {
     const partner = this.partnerRepository.create(createPartnerDto);
     return this.partnerRepository.save(partner);
   }
 
-  async findAll(): Promise<Partner[]> {
+  async findAll(): Promise<PartnerEntity[]> {
     return this.partnerRepository.find();
   }
 
-  async findOne(id: number): Promise<Partner> {
+  async findOne(id: number): Promise<PartnerEntity> {
     return this.partnerRepository.findOne({ where: { id } });
   }
 
   async update(
     id: number,
     updatePartnerDto: UpdatePartnerDto,
-  ): Promise<Partner> {
+  ): Promise<PartnerEntity> {
     await this.partnerRepository.update(id, updatePartnerDto);
     return this.partnerRepository.findOne({ where: { id } });
   }

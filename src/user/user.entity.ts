@@ -19,7 +19,8 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from './user-role.enum';
 import { FeedbackEntity } from '../feedback/feedback.entity';
-import { Partner } from '../partner/entities/partner.entity';
+import { PartnerEntity } from '../partner/entities/partner.entity';
+import { PurchaseEntity } from '../purchases/entities/purchase.entity';
 
 @Entity()
 @Unique(['username', 'email'])
@@ -106,8 +107,11 @@ export class UserEntity {
   })
   feedbacks: FeedbackEntity[];
 
-  @OneToOne(() => Partner, (partner) => partner.user)
-  partner: Partner;
+  @OneToMany(() => PurchaseEntity, (purchase) => purchase.purchaser)
+  purchases: PurchaseEntity[];
+
+  @OneToOne(() => PartnerEntity, (partner) => partner.user)
+  partner: PartnerEntity;
 
   @Column({ nullable: true })
   passwordResetToken: string;

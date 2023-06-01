@@ -22,6 +22,8 @@ import { PartnerModule } from './partner/partner.module';
 import { PartnerController } from './partner/partner.controller';
 import { MetricsController } from './metrics/metrics.controller';
 import { MetricsModule } from './metrics/metrics.module';
+import { NodeModule } from './node/node.module';
+import { PurchasesModule } from './purchases/purchases.module';
 dotenv.config();
 
 @Module({
@@ -41,6 +43,8 @@ dotenv.config();
     HealthModule,
     PartnerModule,
     MetricsModule,
+    NodeModule,
+    PurchasesModule,
   ],
   controllers: [
     AppController,

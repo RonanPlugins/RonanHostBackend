@@ -14,7 +14,7 @@ import { PartnerService } from './partner.service';
 import { CreatePartnerDto } from './dto/create-partner.dto';
 import { UpdatePartnerDto } from './dto/update-partner.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { Partner } from './entities/partner.entity';
+import { PartnerEntity } from './entities/partner.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RoleAuthGuard } from '../auth/guards/role-auth.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -28,7 +28,7 @@ export class PartnerController {
   @Post()
   @ApiBody({ type: CreatePartnerDto })
   @UsePipes(new ValidationPipe())
-  create(@Body() createPartnerDto: CreatePartnerDto): Promise<Partner> {
+  create(@Body() createPartnerDto: CreatePartnerDto): Promise<PartnerEntity> {
     return this.partnerService.create(createPartnerDto);
   }
 
